@@ -1,5 +1,12 @@
 import { useState } from "react";
-import { Wind, CloudRain, Sunrise, Sunset, ChevronDown } from "lucide-react";
+import {
+  Wind,
+  CloudRain,
+  Sunrise,
+  Sunset,
+  ChevronDown,
+  ArrowUpRight,
+} from "lucide-react";
 import type { WeatherSnapshot } from "../services/weather";
 import { hpaToInHg, degreesToCompass } from "../services/weather";
 import { dailyOutlook, scoreForecast } from "../engine/forecast";
@@ -7,162 +14,244 @@ import { getFishingWindows } from "../engine/fishingWindows";
 import {
   dateKey,
   formatClock,
+  formatDay,
   formatNumber,
   weatherDescription,
 } from "../utils/format";
 import WeatherIcon from "../components/WeatherIcon";
-import { band } from "./TodayPage";
-
-const weekday = (value: string, tz: string) =>
-  new Intl.DateTimeFormat("en-US", { timeZone: tz, weekday: "short" }).format(
-    new Date(value),
-  );
-
+import { scoreTone } from "../utils/presentation";
+import { scrollToSection } from "../utils/scroll";
+import FishingWindows from "../components/FishingWindows";
+import ScoreReasons from "../components/ScoreReasons";
 export default function ForecastPage({
   weather,
 }: {
   weather: WeatherSnapshot;
 }) {
-  const tz = weather.timezone,
-    today = dateKey(weather.current.time, tz),
+  const today = dateKey(weather.current.time, weather.timezone),
     [selectedDay, setSelectedDay] = useState(today),
-    [openHour, setOpenHour] = useState<string | null>(null);
+    [selectedHour, setSelectedHour] = useState<string | null>(null);
+  const now = Date.parse(weather.current.time),
+    nowHour = Math.floor(now / 3600000) * 3600000;
   const scored = scoreForecast(weather),
     outlook = weather.daily
       .filter((d) => d.date >= today)
       .slice(0, 7)
-      .map((d) => dailyOutlook(d, scored, tz));
+      .map((d) => {
+        const day = dailyOutlook(d, scored, weather.timezone);
+        return d.date === today
+          ? {
+              ...day,
+              windows: getFishingWindows(
+                scored.filter(
+                  (h) =>
+                    dateKey(h.time, weather.timezone) === today &&
+                    Date.parse(h.time) >= now,
+                ),
+              ),
+            }
+          : day;
+      });
   const date = outlook.some((d) => d.date === selectedDay)
       ? selectedDay
       : today,
-    day = outlook.find((d) => d.date === date);
-  const nowHour =
-    Math.floor(Date.parse(weather.current.time) / 3600000) * 3600000;
+    selected = outlook.find((d) => d.date === date);
   const hours = scored.filter(
-    (h) =>
-      dateKey(h.time, tz) === date &&
-      (date !== today || Date.parse(h.time) >= nowHour),
-  );
-  // Same rule as Today: only hours still ahead count toward today's window.
-  const now = Date.parse(weather.current.time),
-    best = getFishingWindows(
-      hours.filter((h) => date !== today || Date.parse(h.time) >= now),
-    )[0];
+      (h) =>
+        dateKey(h.time, weather.timezone) === date &&
+        (date !== today || Date.parse(h.time) >= nowHour),
+    ),
+    picked = hours.find((h) => h.time === selectedHour);
+  function choose(date: string) {
+    setSelectedDay(date);
+    setSelectedHour(null);
+    scrollToSection("hourly-forecast");
+  }
   return (
     <div className="content">
-      <div className="day-chips" role="tablist" aria-label="Day">
-        {outlook.map((d) => (
-          <button
-            key={d.date}
-            role="tab"
-            aria-selected={d.date === date}
-            className={d.date === date ? "selected" : ""}
-            onClick={() => {
-              setSelectedDay(d.date);
-              setOpenHour(null);
-            }}
-          >
-            <span>{d.date === today ? "Today" : weekday(d.time, tz)}</span>
-            <WeatherIcon code={d.weatherCode} size={20} />
-            <b className={`mini-score ${band(d.score ?? 0)}`}>
-              {d.score ?? "—"}
-            </b>
-          </button>
-        ))}
-      </div>
-
-      {day && (
-        <section className="card day-summary">
-          <div className="day-top">
-            <WeatherIcon code={day.weatherCode} size={34} />
-            <div>
-              <strong>{weatherDescription(day.weatherCode)}</strong>
-              <span>
-                {formatNumber(day.high, 0, "°")} /{" "}
-                {formatNumber(day.low, 0, "°")}
+      <section className="card">
+        <div className="section-head">
+          <div>
+            <span className="kicker">PLAN AHEAD</span>
+            <h3>7-day fishing outlook</h3>
+          </div>
+          <span className="forecast-zone">{weather.timezone}</span>
+        </div>
+        <p className="fine-print">
+          Daily score = average of available hourly scores. Tap a day for its
+          full breakdown.
+        </p>
+        <div className="daily-grid">
+          {outlook.map((day) => (
+            <button
+              className={`day-card ${date === day.date ? "selected" : ""}`}
+              key={day.date}
+              onClick={() => choose(day.date)}
+              aria-pressed={date === day.date}
+            >
+              <div className="day-title">
+                <strong>
+                  {day.date === today
+                    ? "Today"
+                    : formatDay(day.time, weather.timezone)}
+                </strong>
+                <span
+                  className={`daily-score tone-${scoreTone(day.score ?? 0)}`}
+                >
+                  {day.score ?? "—"}
+                  <small>{day.label}</small>
+                </span>
+              </div>
+              <div className="day-weather">
+                <WeatherIcon code={day.weatherCode} />
+                <span>{weatherDescription(day.weatherCode)}</span>
+                <b>
+                  {formatNumber(day.high, 0, "°")} /{" "}
+                  {formatNumber(day.low, 0, "°")}
+                </b>
+              </div>
+              <div className="day-stats">
+                <span>
+                  <Wind size={14} />
+                  {formatNumber(day.windMph, 0, " mph max")}
+                </span>
+                <span>
+                  <CloudRain size={14} />
+                  {formatNumber(day.precipitationChance, 0, "% max")}
+                </span>
+                <span>
+                  <Sunrise size={14} />
+                  {formatClock(day.sunrise, weather.timezone)}
+                </span>
+                <span>
+                  <Sunset size={14} />
+                  {formatClock(day.sunset, weather.timezone)}
+                </span>
+              </div>
+              <div className="daily-window">
+                <span>BEST WINDOW</span>
+                <b>
+                  {day.windows[0]
+                    ? `${formatClock(day.windows[0].start, weather.timezone)} – ${formatClock(day.windows[0].end, weather.timezone)}`
+                    : "No strong continuous window"}
+                </b>
+              </div>
+              <span className="day-action">
+                View hourly conditions
+                <ChevronDown size={14} />
               </span>
-            </div>
-          </div>
-          <p className="best-line">
-            Best bite{" "}
-            <b>
-              {best
-                ? `${formatClock(best.start, tz)} – ${formatClock(best.end, tz)}`
-                : "no strong window"}
-            </b>
+            </button>
+          ))}
+        </div>
+        {!outlook.length && (
+          <p>
+            Daily outlook unavailable. Available hourly data is shown below.
           </p>
-          <div className="mini-stats">
-            <span>
-              <Wind size={15} />
-              {formatNumber(day.windMph, 0, " mph")}
-            </span>
-            <span>
-              <CloudRain size={15} />
-              {formatNumber(day.precipitationChance, 0, "%")}
-            </span>
-            <span>
-              <Sunrise size={15} />
-              {formatClock(day.sunrise, tz)}
-            </span>
-            <span>
-              <Sunset size={15} />
-              {formatClock(day.sunset, tz)}
-            </span>
+        )}
+      </section>
+      <section className="card" id="hourly-forecast">
+        <div className="section-head">
+          <div>
+            <span className="kicker">EVERY HOUR EXPLAINED</span>
+            <h3>
+              {date === today
+                ? "Today"
+                : selected
+                  ? formatDay(selected.time, weather.timezone)
+                  : date}{" "}
+              · Hourly forecast
+            </h3>
           </div>
-        </section>
-      )}
-
-      <section className="card hour-list">
-        {hours.map((h) => {
-          const open = openHour === h.time,
-            best = h.result.reasons.filter((r) => r.impact !== 0);
-          return (
-            <div className={`hour-row ${open ? "open" : ""}`} key={h.time}>
-              <button
-                onClick={() => setOpenHour(open ? null : h.time)}
-                aria-expanded={open}
-              >
-                <span className="t">{formatClock(h.time, tz, true)}</span>
-                <b className={`mini-score ${band(h.score)}`}>{h.score}</b>
-                <WeatherIcon code={h.weatherCode} size={20} />
-                <span className="temp">
+        </div>
+        <FishingWindows
+          windows={getFishingWindows(
+            hours.filter(
+              (h) =>
+                date !== today ||
+                Date.parse(h.time) >= Date.parse(weather.current.time),
+            ),
+          )}
+          timezone={weather.timezone}
+        />
+        <div className="forecast-hours">
+          {hours.map((h) => (
+            <details className="forecast-hour" key={h.time}>
+              <summary>
+                <span className="forecast-hour-icon">
+                  <WeatherIcon code={h.weatherCode} size={23} />
+                </span>
+                <span className="forecast-hour-time">
+                  <strong>{formatClock(h.time, weather.timezone, true)}</strong>
+                  <small>{h.result.label}</small>
+                </span>
+                <span className="forecast-hour-temp">
                   {formatNumber(h.temperature, 0, "°")}
                 </span>
-                <span className="wind">
-                  {h.windMph === null
-                    ? "—"
-                    : `${formatNumber(h.windMph, 0)} ${degreesToCompass(h.windDirection)}`}
+                <span className={`score-pill tone-${scoreTone(h.score)}`}>
+                  {h.score}
                 </span>
-                <ChevronDown size={16} className={open ? "flip" : ""} />
-              </button>
-              {open && (
-                <div className="hour-detail">
-                  <p>
-                    Pressure{" "}
-                    {h.pressureHpa === null
-                      ? "—"
-                      : formatNumber(hpaToInHg(h.pressureHpa), 2, " inHg")}{" "}
-                    · {h.result.pressure.label} · Clouds{" "}
-                    {formatNumber(h.cloudCover, 0, "%")} · Rain{" "}
-                    {formatNumber(h.precipitationChance, 0, "%")}
-                  </p>
-                  {best.map((r) => (
-                    <div className="reason" key={r.text}>
-                      <span>{r.text}</span>
-                      <strong
-                        className={r.impact >= 0 ? "positive" : "negative"}
-                      >
-                        {r.impact >= 0 ? "+" : ""}
-                        {r.impact}
-                      </strong>
-                    </div>
-                  ))}
+                <ChevronDown size={15} />
+              </summary>
+              <div className="forecast-hour-details">
+                <div className="hour-metrics">
+                  <div>
+                    <small>PRESSURE</small>
+                    <strong>
+                      {h.pressureHpa === null
+                        ? "Unavailable"
+                        : formatNumber(hpaToInHg(h.pressureHpa), 2, " inHg")}
+                    </strong>
+                  </div>
+                  <div>
+                    <small>TREND</small>
+                    <strong>{h.result.pressure.label}</strong>
+                  </div>
+                  <div>
+                    <small>WIND</small>
+                    <strong>
+                      {h.windMph === null
+                        ? "Unavailable"
+                        : `${formatNumber(h.windMph, 0, " mph")} ${degreesToCompass(h.windDirection)}`}
+                    </strong>
+                  </div>
+                  <div>
+                    <small>CLOUD COVER</small>
+                    <strong>{formatNumber(h.cloudCover, 0, "%")}</strong>
+                  </div>
+                  <div>
+                    <small>RAIN CHANCE</small>
+                    <strong>
+                      {formatNumber(h.precipitationChance, 0, "%")}
+                    </strong>
+                  </div>
+                  <div>
+                    <small>CONDITIONS</small>
+                    <strong>{weatherDescription(h.weatherCode)}</strong>
+                  </div>
                 </div>
-              )}
-            </div>
-          );
-        })}
-        {!hours.length && <p className="muted">No hourly data for this day.</p>}
+                <button
+                  className="hour-explain-button"
+                  onClick={() =>
+                    setSelectedHour(selectedHour === h.time ? null : h.time)
+                  }
+                  aria-label={`Explain score at ${formatClock(h.time, weather.timezone)}`}
+                  aria-expanded={picked?.time === h.time}
+                >
+                  Why this score?
+                  <ArrowUpRight size={16} />
+                </button>
+                {picked?.time === h.time && (
+                  <ScoreReasons result={picked.result} />
+                )}
+              </div>
+            </details>
+          ))}
+        </div>
+        {!hours.length && <p>No hourly readings are available for this day.</p>}
+        <p className="fine-print">
+          {hours.length} available hourly readings for this day. Today shows the
+          hours still ahead. Tap an hour to explore its conditions and score.
+        </p>
       </section>
     </div>
   );
