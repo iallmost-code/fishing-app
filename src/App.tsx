@@ -1,11 +1,7 @@
-import { lazy, Suspense, useState } from "react";
-import {
-  MapPin,
-  RefreshCw,
-  ChevronDown,
-  LocateOff,
-  Locate,
-} from "lucide-react";
+import { lazy, Suspense, useEffect, useState } from "react";
+import { Waves } from "lucide-react";
+import AppHeader from "./components/AppHeader";
+import { motionBehavior, scrollToSection } from "./utils/scroll";
 import { useFishingConditions } from "./hooks/useFishingConditions";
 import { useNearbyWater } from "./hooks/useNearbyWater";
 import Navigation, { type AppTab, TABS } from "./components/Navigation";
@@ -15,11 +11,11 @@ import type { WaterLocation } from "./models/waterLocation";
 import TodayPage from "./pages/TodayPage";
 import ForecastPage from "./pages/ForecastPage";
 import ScreenErrorBoundary from "./components/ScreenErrorBoundary";
-import { formatClock } from "./utils/format";
 const SpotsPage = lazy(() => import("./pages/SpotsPage"));
 
 function initialTab(): AppTab {
-  const hash = window.location.hash.slice(1);
+  const raw = window.location.hash.slice(1);
+  const hash = raw === "Home" ? "Today" : raw === "Map" ? "Spots" : raw;
   return (TABS as readonly string[]).includes(hash)
     ? (hash as AppTab)
     : "Today";
@@ -31,81 +27,49 @@ export default function App() {
     [showLocation, setShowLocation] = useState(false),
     [radius, setRadius] = useState(10),
     [openSpot, setOpenSpot] = useState<WaterLocation | null>(null);
-  const { location, weather, loading, error, locationStatus } = conditions;
+  const { location, weather, loading, error, offline } = conditions;
   const water = useNearbyWater(location, radius);
   function navigate(next: AppTab) {
     setTab(next);
+    setShowLocation(false);
     window.history.replaceState(null, "", `#${next}`);
-    window.scrollTo({ top: 0 });
+    window.scrollTo({ top: 0, behavior: motionBehavior() });
   }
-  const gpsLine =
-    locationStatus === "locating"
-      ? "Finding you…"
-      : location.source === "gps"
-        ? `GPS${location.accuracy ? ` · ±${Math.round(location.accuracy * 3.281)} ft` : ""}`
-        : locationStatus === "denied"
-          ? "Location off · tap to fix"
-          : location.source === "spot"
-            ? "Fishing spot"
-            : location.source === "manual"
-              ? "Searched town"
-              : "Default spot · tap to use GPS";
+  useEffect(() => {
+    const update = () => {
+      setTab(initialTab());
+      setShowLocation(false);
+      window.scrollTo({ top: 0 });
+    };
+    window.addEventListener("hashchange", update);
+    return () => window.removeEventListener("hashchange", update);
+  }, []);
   return (
-    <div className="app-shell">
-      <header className="top-bar">
-        <button
-          className="place-button"
-          onClick={() => setShowLocation(true)}
-          aria-label="Change location"
-        >
-          {locationStatus === "denied" ? (
-            <LocateOff size={20} />
-          ) : location.source === "gps" ? (
-            <Locate size={20} />
-          ) : (
-            <MapPin size={20} />
-          )}
-          <span>
-            <strong>
-              {location.name}
-              <ChevronDown size={16} />
-            </strong>
-            <small className={locationStatus === "denied" ? "warn" : ""}>
-              {gpsLine}
-              {weather && !loading
-                ? ` · ${formatClock(weather.fetchedAt, weather.timezone)}`
-                : ""}
-            </small>
-          </span>
-        </button>
-        <button
-          className="icon-button"
-          onClick={() =>
-            location.source === "gps"
-              ? void conditions.useGPS()
-              : void conditions.refresh()
-          }
-          disabled={loading || locationStatus === "locating"}
-          aria-label="Refresh"
-        >
-          <RefreshCw
-            size={20}
-            className={loading || locationStatus === "locating" ? "spin" : ""}
-          />
-        </button>
-      </header>
-      {conditions.offline && (
-        <div className="banner" role="status">
-          You're offline{weather ? " — showing the last weather." : "."}
-        </div>
-      )}
-      {error && (
-        <div className="banner error" role="alert">
-          {error}
-          <button onClick={() => void conditions.refresh()}>Retry</button>
-        </div>
-      )}
-      <main className="screen">
+    <div className={`app-shell tab-${tab.toLowerCase()}`}>
+      <div className="page-bass-background" aria-hidden="true">
+        <img src="./brand/bass-hero.webp" alt="" />
+      </div>
+      <a
+        className="skip-link"
+        href="#main-content"
+        onClick={(e) => {
+          e.preventDefault();
+          document
+            .getElementById("main-content")
+            ?.focus({ preventScroll: true });
+          scrollToSection("main-content");
+        }}
+      >
+        Skip to content
+      </a>
+      <AppHeader
+        tab={tab}
+        conditions={conditions}
+        showLocation={showLocation}
+        onLocation={() => setShowLocation(true)}
+      />
+      <main className="screen" id="main-content" tabIndex={-1}>
+        <h1 className="sr-only">WTF — Where’s the Fish · {tab}</h1>
         {tab === "Spots" ? (
           <ScreenErrorBoundary>
             <Suspense fallback={<div className="card">Loading map…</div>}>
@@ -124,6 +88,7 @@ export default function App() {
           ) : (
             <TodayPage
               weather={weather}
+              stale={!!error || offline}
               water={water}
               onForecast={() => navigate("Forecast")}
               onSpots={() => navigate("Spots")}
@@ -131,13 +96,15 @@ export default function App() {
             />
           )
         ) : loading ? (
-          <div className="skeleton" aria-label="Loading conditions">
-            <div />
-            <div />
-            <div />
-          </div>
+          <section className="card loading-card" role="status">
+            <span className="loading-ripple">
+              <Waves size={30} />
+            </span>
+            <h2>Reading the water…</h2>
+            <p>Checking the conditions for your next cast.</p>
+          </section>
         ) : (
-          <section className="card empty">
+          <section className="card empty-page">
             <h2>No weather yet</h2>
             <p>Check your connection, or pick a different spot.</p>
             <button
@@ -149,6 +116,20 @@ export default function App() {
           </section>
         )}
       </main>
+      <footer>
+        <div className="footer-brand">
+          <Waves size={17} />
+          <strong>Less guessing. More fishing.</strong>
+        </div>
+        <p>
+          Weather by{" "}
+          <a href="https://open-meteo.com/" target="_blank" rel="noreferrer">
+            Open-Meteo
+          </a>{" "}
+          · Fishing scores are guidance, not a guarantee.
+        </p>
+        <span>WTF — WHERE’S THE FISH · MADE FOR DAYS ON THE WATER</span>
+      </footer>
       <Navigation tab={tab} onChange={navigate} />
       {openSpot && (
         <SpotSheet

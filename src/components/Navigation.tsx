@@ -1,7 +1,7 @@
-import { Gauge, MapPinned, CalendarDays } from "lucide-react";
+import { House, MapPinned, ChartNoAxesCombined } from "lucide-react";
 export const TABS = ["Today", "Spots", "Forecast"] as const;
 export type AppTab = (typeof TABS)[number];
-const icons = { Today: Gauge, Spots: MapPinned, Forecast: CalendarDays };
+const icons = { Today: House, Spots: MapPinned, Forecast: ChartNoAxesCombined };
 export default function Navigation({
   tab,
   onChange,
@@ -16,11 +16,13 @@ export default function Navigation({
         return (
           <button
             key={name}
-            className={name === tab ? "active" : ""}
+            className={`nav-${name.toLowerCase()} ${name === tab ? "active" : ""}`}
             aria-current={name === tab ? "page" : undefined}
             onClick={() => onChange(name)}
           >
-            <Icon size={24} />
+            <span className="nav-icon">
+              <Icon size={21} />
+            </span>
             <span>{name}</span>
           </button>
         );

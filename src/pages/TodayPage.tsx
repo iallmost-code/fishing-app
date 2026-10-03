@@ -1,227 +1,202 @@
-import { useState } from "react";
 import {
+  ArrowUpRight,
+  Clock3,
+  Map,
+  ChartNoAxesCombined,
   Gauge,
-  Wind,
-  Sunrise,
   Sunset,
-  ChevronRight,
-  ChevronDown,
-  TrendingDown,
-  TrendingUp,
-  MoveRight,
 } from "lucide-react";
 import { calculateFishingScore } from "../engine/fishingScore";
 import { scoreForecast } from "../engine/forecast";
 import { getFishingWindows } from "../engine/fishingWindows";
 import { getLureRecommendations } from "../engine/lureRecommendations";
-import {
-  hpaToInHg,
-  degreesToCompass,
-  type WeatherSnapshot,
-} from "../services/weather";
-import {
-  dateKey,
-  formatClock,
-  formatNumber,
-  weatherDescription,
-} from "../utils/format";
+import { hpaToInHg, type WeatherSnapshot } from "../services/weather";
+import { dateKey, formatClock, formatNumber } from "../utils/format";
 import type { WaterLocation } from "../models/waterLocation";
 import type { NearbyWaterState } from "../hooks/useNearbyWater";
-import PressureChart from "../components/PressureChart";
-import ScoreReasons from "../components/ScoreReasons";
-import WeatherIcon from "../components/WeatherIcon";
-import ScoreRing from "../components/ScoreRing";
 import SpotRow from "../components/SpotRow";
-
+import PressureChart from "../components/PressureChart";
+import FishingWindows from "../components/FishingWindows";
+import ScoreReasons from "../components/ScoreReasons";
+import BiteScoreCard from "../components/BiteScoreCard";
+import ConditionsCard from "../components/ConditionsCard";
+import LurePicks from "../components/LurePicks";
+import HourlyPreview from "../components/HourlyPreview";
 export default function TodayPage({
   weather,
-  water,
   onForecast,
   onSpots,
+  water,
   onOpenSpot,
+  stale,
 }: {
   weather: WeatherSnapshot;
-  water: NearbyWaterState;
   onForecast: () => void;
   onSpots: () => void;
+  water: NearbyWaterState;
   onOpenSpot: (spot: WaterLocation) => void;
+  stale: boolean;
 }) {
-  const [morePicks, setMorePicks] = useState(false);
   const score = calculateFishingScore(weather),
     lures = getLureRecommendations(weather, score.pressure),
-    allHours = scoreForecast(weather),
-    tz = weather.timezone;
-  const today = dateKey(weather.current.time, tz),
+    allHours = scoreForecast(weather);
+  const today = dateKey(weather.current.time, weather.timezone),
     now = Date.parse(weather.current.time);
-  const windows = getFishingWindows(
-    allHours.filter(
-      (h) => dateKey(h.time, tz) === today && Date.parse(h.time) >= now,
+  const remaining = allHours.filter(
+      (h) =>
+        dateKey(h.time, weather.timezone) === today &&
+        Date.parse(h.time) >= now,
     ),
-  );
+    windows = getFishingWindows(remaining);
   const upcoming = allHours
     .filter((h) => Date.parse(h.time) >= Math.floor(now / 3600000) * 3600000)
     .slice(0, 12);
-  const c = weather.current,
-    best = windows[0],
-    trend = score.pressure.label.toLowerCase();
-  const TrendIcon = trend.includes("falling")
-    ? TrendingDown
-    : trend.includes("rising")
-      ? TrendingUp
-      : MoveRight;
-  // Show whichever of sunrise/sunset is next.
-  const sunsetNext = !weather.sunset || Date.parse(weather.sunset) > now;
+  const change = (v: number | null) =>
+    v === null
+      ? "Unavailable"
+      : `${v >= 0 ? "+" : ""}${hpaToInHg(v).toFixed(3)} inHg`;
   return (
-    <div className="content">
-      <section className="hero-card">
-        <ScoreRing score={score.score} label={score.label} />
-        <div className="hero-copy">
-          <h1>
-            {score.score >= 70
-              ? "Good time to fish"
-              : score.score >= 50
-                ? "Worth a shot"
-                : "Tough bite"}
-          </h1>
-          <p className="best-bite">
-            {best ? (
-              <>
-                Best bite <b>{formatClock(best.start, tz)}</b> –{" "}
-                <b>{formatClock(best.end, tz)}</b>
-              </>
-            ) : (
-              "No strong window left today"
-            )}
-          </p>
-          <p className="now-weather">
-            <WeatherIcon code={c.weatherCode} size={18} />
-            {formatNumber(c.temperature, 0, "°")} ·{" "}
-            {weatherDescription(c.weatherCode)}
-          </p>
-        </div>
-      </section>
-
-      <section className="stat-row">
-        <div className="stat">
-          <Gauge size={18} />
-          <small>Pressure</small>
+    <div className="content home-content">
+      <div className="today-heading">
+        <span>Your day on the water</span>
+        <span className={`data-pill ${stale ? "is-stale" : ""}`}>
+          <i />
+          {stale ? "PREVIOUS WEATHER" : "LIVE CONDITIONS"}
+        </span>
+      </div>
+      <BiteScoreCard score={score} />
+      <button className="best-bite-banner" onClick={onForecast}>
+        <span className="best-bite-icon">
+          <Sunset size={25} />
+        </span>
+        <span>
+          <small>
+            {windows[0] ? "YOUR BEST BITE WINDOW" : "MAKE EVERY HOUR COUNT"}
+          </small>
           <strong>
-            {score.pressure.label === "Unavailable" ? (
-              "Trend n/a"
-            ) : (
-              <>
-                <TrendIcon size={16} />
-                {score.pressure.label}
-              </>
-            )}
+            {windows[0]
+              ? `${formatClock(windows[0].start, weather.timezone)} – ${formatClock(windows[0].end, weather.timezone)}`
+              : "Find your best time to cast"}
           </strong>
           <span>
-            {c.pressureHpa === null
-              ? "—"
-              : formatNumber(hpaToInHg(c.pressureHpa), 2, " inHg")}
+            {windows[0]
+              ? `Average score ${windows[0].averageScore} · Time to make a plan`
+              : "No strong continuous window. Explore today’s hours."}
           </span>
-        </div>
-        <div className="stat">
-          <Wind size={18} />
-          <small>Wind</small>
-          <strong>{formatNumber(c.windMph, 0, " mph")}</strong>
-          <span>
-            {c.windMph === null ? "—" : degreesToCompass(c.windDirection)}
-          </span>
-        </div>
-        <div className="stat">
-          {sunsetNext ? <Sunset size={18} /> : <Sunrise size={18} />}
-          <small>{sunsetNext ? "Sunset" : "Sunrise"}</small>
-          <strong>
-            {formatClock(sunsetNext ? weather.sunset : weather.sunrise, tz)}
-          </strong>
-          <span>Rain {formatNumber(c.precipitationChance, 0, "%")}</span>
-        </div>
-      </section>
-
-      {lures[0] && (
-        <section className="card">
-          <span className="kicker">THROW THIS</span>
-          <div className="lure top">
-            <h2>{lures[0].name}</h2>
-            <p>
-              <b>{lures[0].color}</b> · {lures[0].retrieve}
-            </p>
-            <p className="muted">{lures[0].target}</p>
+        </span>
+        <ArrowUpRight size={20} />
+      </button>
+      <div className="quick-actions">
+        <button className="action-forecast" onClick={onForecast}>
+          <ChartNoAxesCombined size={21} />
+          <span>Fishing forecast</span>
+          <ArrowUpRight size={16} />
+        </button>
+        <button className="action-map" onClick={onSpots}>
+          <Map size={21} />
+          <span>Find fishing spots</span>
+          <ArrowUpRight size={16} />
+        </button>
+      </div>
+      <HourlyPreview
+        hours={upcoming}
+        timezone={weather.timezone}
+        onForecast={onForecast}
+      />
+      <LurePicks lures={lures} />
+      <section className="card">
+        <div className="section-head">
+          <div>
+            <span className="kicker">YOUR NEXT GREAT CAST</span>
+            <h3>Spots near you.</h3>
           </div>
-          {morePicks &&
-            lures.slice(1).map((lure) => (
-              <div className="lure" key={lure.name}>
-                <h3>{lure.name}</h3>
-                <p>
-                  <b>{lure.color}</b> · {lure.retrieve}
-                </p>
-                <p className="muted">{lure.target}</p>
-              </div>
-            ))}
-          {lures.length > 1 && (
-            <button
-              className="text-button"
-              onClick={() => setMorePicks(!morePicks)}
-              aria-expanded={morePicks}
-            >
-              {morePicks ? "Fewer picks" : `${lures.length - 1} more picks`}
-              <ChevronDown size={16} className={morePicks ? "flip" : ""} />
-            </button>
-          )}
-        </section>
-      )}
-
-      <section className="card">
-        <button className="card-head" onClick={onForecast}>
-          <span className="kicker">NEXT 12 HOURS</span>
-          <ChevronRight size={18} />
-        </button>
-        <div className="hour-strip">
-          {upcoming.map((hour) => (
-            <div className="hour" key={hour.time}>
-              <span>{formatClock(hour.time, tz, true)}</span>
-              <b className={`mini-score ${band(hour.score)}`}>{hour.score}</b>
-              <WeatherIcon code={hour.weatherCode} size={18} />
-              <small>{formatNumber(hour.temperature, 0, "°")}</small>
-            </div>
-          ))}
+          <button className="text-button" onClick={onSpots}>
+            Explore <ArrowUpRight size={16} />
+          </button>
         </div>
-      </section>
-
-      <section className="card">
-        <button className="card-head" onClick={onSpots}>
-          <span className="kicker">SPOTS NEAR YOU</span>
-          <ChevronRight size={18} />
-        </button>
         {water.loading && !water.spots.length ? (
           <p className="muted">Looking for water nearby…</p>
         ) : water.spots.length ? (
           <div className="spot-list">
-            {water.spots.slice(0, 3).map((s) => (
-              <SpotRow key={s.id} spot={s} onClick={() => onOpenSpot(s)} />
+            {water.spots.slice(0, 3).map((spot) => (
+              <SpotRow
+                key={spot.id}
+                spot={spot}
+                onClick={() => onOpenSpot(spot)}
+              />
             ))}
           </div>
         ) : (
           <p className="muted">No mapped water found within range.</p>
         )}
       </section>
-
-      <details className="card more">
-        <summary>Pressure graph</summary>
+      <section className="card windows-card">
+        <div className="section-head">
+          <div>
+            <span className="kicker">A LITTLE EDGE ON THE WATER</span>
+            <h3>Your bite windows.</h3>
+          </div>
+          <span className="section-icon yellow">
+            <Clock3 size={20} />
+          </span>
+        </div>
+        <FishingWindows windows={windows} timezone={weather.timezone} />
+      </section>
+      <section className="card">
+        <div className="section-head">
+          <div>
+            <span className="kicker">READ THE CHANGE</span>
+            <h3>Pressure outlook.</h3>
+          </div>
+        </div>
         <PressureChart weather={weather} />
-      </details>
-      <details className="card more">
-        <summary>Why this score</summary>
+      </section>
+      <section className="card pressure-movement">
+        <div className="section-head">
+          <div>
+            <span className="kicker">FOLLOW THE CHANGE</span>
+            <h3>Pressure movement.</h3>
+          </div>
+          <span className="section-icon blue">
+            <Gauge size={20} />
+          </span>
+        </div>
+        <div className="pressure-grid">
+          {[
+            { label: "1 hour", value: score.pressure.oneHour },
+            { label: "3 hours", value: score.pressure.threeHour },
+            { label: "6 hours", value: score.pressure.sixHour },
+          ].map((d) => (
+            <div key={d.label}>
+              <small>{d.label}</small>
+              <strong>{change(d.value)}</strong>
+            </div>
+          ))}
+        </div>
+        <p className="fine-print">
+          Rate:{" "}
+          {score.pressure.rate === null
+            ? "Unavailable"
+            : formatNumber(hpaToInHg(score.pressure.rate), 3, " inHg / hour")}
+        </p>
+      </section>
+      <ConditionsCard weather={weather} />
+      <section className="card" id="score-explanation">
+        <div className="section-head">
+          <div>
+            <span className="kicker">EVERY SCORE EXPLAINED</span>
+            <h3>Why this score.</h3>
+          </div>
+        </div>
         <ScoreReasons result={score} />
-      </details>
-      <p className="credit">
-        Weather: Open-Meteo. Scores are guidance, not a guarantee.
-      </p>
+      </section>
+      <div className="weather-freshness">
+        <span>
+          {stale ? "PREVIOUS WEATHER" : "LIVE WEATHER"} · Updated{" "}
+          {formatClock(weather.fetchedAt, weather.timezone)}
+        </span>
+        <span>{weather.timezone} · Open-Meteo</span>
+      </div>
     </div>
   );
-}
-
-export function band(score: number) {
-  return score >= 70 ? "good" : score >= 50 ? "fair" : "poor";
 }

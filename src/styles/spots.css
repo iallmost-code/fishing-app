@@ -1,0 +1,467 @@
+/* Spots */
+.spot-list {
+  display: grid;
+}
+.spot-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  background: none;
+  border: 0;
+  border-top: 1px solid var(--line);
+  padding: 12px 0;
+  text-align: left;
+  min-height: 60px;
+}
+.spot-row:first-child {
+  border-top: 0;
+  padding-top: 2px;
+}
+.spot-icon {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: #e0f2fe;
+  color: var(--accent);
+}
+.spot-icon.park {
+  background: #dcfce7;
+  color: var(--good);
+}
+.spot-icon.river {
+  background: #cffafe;
+  color: #0e7490;
+}
+.spot-icon.boat-ramp,
+.spot-icon.pier,
+.spot-icon.fishing-spot {
+  background: #fef3c7;
+  color: #b45309;
+}
+.spot-text {
+  min-width: 0;
+  display: grid;
+  gap: 1px;
+}
+.spot-text strong {
+  font-size: 15px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.spot-text small {
+  color: var(--ink-2);
+  font-size: 13px;
+}
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 4px 0 0;
+}
+.tags i {
+  font-style: normal;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #dcfce7;
+  color: #166534;
+}
+.map-wrap {
+  position: relative;
+  margin: 0 -16px;
+}
+.map-frame {
+  position: relative;
+}
+.map-canvas {
+  height: 46vh;
+  min-height: 280px;
+  width: 100%;
+}
+.map-marker {
+  height: 20px;
+  width: 20px;
+  background: #2563eb;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 7px #2563eb30,
+    0 3px 8px #0003;
+}
+.map-recenter {
+  position: absolute;
+  right: 12px;
+  bottom: 40px;
+  z-index: 2;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: #fff;
+  color: var(--accent);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+}
+.map-error {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  z-index: 3;
+  background: #fff7e0;
+  color: #7c4a03;
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-size: 13px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.map-error .text-button {
+  padding: 0;
+}
+.radius-control,
+.filter-row {
+  display: flex;
+  gap: 6px;
+}
+.radius-control {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 2;
+}
+.radius-control button,
+.filter-row button {
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 0;
+  font-weight: 700;
+  font-size: 14px;
+  background: #fff;
+  color: var(--ink);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+.filter-row {
+  overflow-x: auto;
+  scrollbar-width: none;
+  margin: 0 -16px;
+  padding: 0 16px;
+}
+.filter-row::-webkit-scrollbar {
+  display: none;
+}
+.filter-row button {
+  flex: none;
+  background: #fff;
+  color: var(--ink);
+  box-shadow: none;
+}
+.radius-control button.selected,
+.filter-row button.selected {
+  background: var(--ink);
+  color: #fff;
+}
+.maplibregl-ctrl-attrib {
+  font-size: 11px;
+}
+
+/* Bottom sheets */
+.sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(5, 25, 40, 0.45);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: fade 0.15s ease-out;
+}
+.sheet {
+  width: 100%;
+  max-width: 480px;
+  max-height: 88dvh;
+  overflow-y: auto;
+  background: #fff;
+  border-radius: 22px 22px 0 0;
+  padding: 8px 16px calc(20px + var(--safe-b));
+  animation: rise 0.2s ease-out;
+}
+.sheet::before {
+  content: "";
+  display: block;
+  width: 40px;
+  height: 5px;
+  border-radius: 3px;
+  background: #d5e2ea;
+  margin: 0 auto 8px;
+}
+.sheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.sheet-head h2 {
+  margin: 0;
+  font-size: 20px;
+  min-width: 0;
+}
+.sheet-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sheet-body {
+  display: grid;
+  gap: 4px;
+}
+.sheet-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 14px;
+}
+.spot-score {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 10px;
+  padding: 12px;
+  border-radius: 16px;
+  background: var(--blue-2);
+  color: #fff;
+}
+.spot-score p {
+  margin: 2px 0;
+}
+.spot-score .muted {
+  color: #d6efff;
+}
+.spot-score .score-core {
+  background: var(--blue-3);
+}
+.search-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+  position: relative;
+}
+.search-row input {
+  flex: 1;
+  min-width: 0;
+  height: 50px;
+  border-radius: 14px;
+  border: 1px solid #cfe0ea;
+  padding: 0 40px 0 14px;
+  font-size: 16px; /* 16px stops iOS zooming into the field */
+}
+.search-row .clear {
+  position: absolute;
+  right: 66px;
+  top: 0;
+  height: 50px;
+  width: 36px;
+  border: 0;
+  background: none;
+  color: var(--ink-2);
+}
+.search-row > button:last-child {
+  width: 54px;
+  border-radius: 14px;
+  border: 0;
+  background: var(--accent);
+  color: #fff;
+  display: grid;
+  place-items: center;
+}
+.result-list {
+  display: grid;
+  margin-top: 8px;
+}
+.result {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  border: 0;
+  border-top: 1px solid var(--line);
+  background: none;
+  text-align: left;
+}
+@keyframes rise {
+  from {
+    transform: translateY(40px);
+    opacity: 0;
+  }
+}
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Shared controls used by the location and fishing-spot sheets. */
+.muted {
+  color: var(--muted);
+}
+.credit {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: center;
+}
+.sheet .credit {
+  text-align: left;
+  margin-top: 14px;
+}
+.icon-button.plain {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: var(--soft);
+  color: var(--ink);
+  border-radius: 50%;
+}
+.wide {
+  width: 100%;
+}
+.secondary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 50px;
+  padding: 0 18px;
+  border-radius: 14px;
+  font-weight: 700;
+  border: 0;
+  background: var(--lime);
+  color: #2c5426;
+}
+.inline-error {
+  color: var(--danger);
+  font-size: 14px;
+  margin-top: 10px;
+}
+.banner {
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: #fff5d9;
+  color: #6d5220;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.banner button {
+  min-height: 44px;
+  border: 0;
+  background: none;
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.sheet .score-ring {
+  flex: none;
+  width: var(--size);
+  height: var(--size);
+}
+.sheet .score-core {
+  width: calc(var(--size) - 14px);
+  height: calc(var(--size) - 14px);
+  color: white;
+}
+.sheet .score-core strong {
+  font-size: calc(var(--size) * 0.33);
+}
+.sheet .score-core span {
+  font-size: 9px;
+}
+.sheet-actions .primary-button {
+  min-height: 50px;
+}
+.sheet .search-row .clear {
+  min-width: 44px;
+}
+.spot-row {
+  color: var(--ink);
+}
+/* Keep map controls clear of the radius chips and readable on narrow phones. */
+.spots .map-canvas {
+  height: 46dvh;
+  min-height: 280px;
+}
+.spots .map-recenter {
+  top: auto;
+  left: auto;
+  right: 12px;
+  bottom: 40px;
+  padding: 10px;
+}
+.spots .radius-control {
+  padding: 0;
+}
+.spots .radius-control button {
+  padding: 0 12px;
+  font-size: 13px;
+  color: var(--ink);
+}
+.spots .radius-control button.selected {
+  color: white;
+}
+.spots .filter-row button {
+  min-height: 44px;
+}
+.sheet-backdrop {
+  z-index: 100;
+}
+.sheet-head h2 {
+  overflow-wrap: anywhere;
+}
+.sheet .spot-score {
+  padding: 14px 12px;
+  gap: 12px;
+}
+.sheet .spot-score > div:last-child {
+  min-width: 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.sheet .spot-score .score-core span {
+  color: #e0f8fa;
+  letter-spacing: 0;
+}
+.sheet .search-row input:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 2px;
+}
+.sheet .score-core strong {
+  color: white;
+}
+.spots .radius-control button {
+  flex: none;
+  min-width: 54px;
+  white-space: nowrap;
+}
