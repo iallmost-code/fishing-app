@@ -104,7 +104,7 @@
   display: grid;
   place-items: center;
   border: 0;
-  background: #fff;
+  background: var(--panel);
   color: var(--accent);
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
@@ -146,7 +146,7 @@
   border: 0;
   font-weight: 700;
   font-size: 14px;
-  background: #fff;
+  background: var(--panel);
   color: var(--ink);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
@@ -161,7 +161,7 @@
 }
 .filter-row button {
   flex: none;
-  background: #fff;
+  background: var(--panel);
   color: var(--ink);
   box-shadow: none;
 }
@@ -190,7 +190,7 @@
   max-width: 480px;
   max-height: 88dvh;
   overflow-y: auto;
-  background: #fff;
+  background: var(--panel);
   border-radius: 22px 22px 0 0;
   padding: 8px 16px calc(20px + var(--safe-b));
   animation: rise 0.2s ease-out;
@@ -261,7 +261,9 @@
   min-width: 0;
   height: 50px;
   border-radius: 14px;
-  border: 1px solid #cfe0ea;
+  border: 1px solid var(--line);
+  background: var(--field);
+  color: var(--ink);
   padding: 0 40px 0 14px;
   font-size: 16px; /* 16px stops iOS zooming into the field */
 }

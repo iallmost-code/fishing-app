@@ -41,6 +41,6 @@ Phone screenshots at 412 × 915 using actual weather and nearby-water results at
 
 ## Mobile visual design
 
-The app now uses the WTF — Where’s the Fish brand, the supplied crossed-hooks logo, a locally bundled bass header and soft background on every tab, colorful thumb-friendly actions, and a phone-width layout capped at 480 CSS pixels. Forecast hours expand into touch-friendly cards. Presentation changes do not modify weather, pressure, fishing-score, window, or lure rules.
+The app now uses the WTF — Where’s the Fish brand, the supplied crossed-hooks logo, a locally bundled bass header and soft background on every tab, colorful thumb-friendly actions, soft seafoam and lake-blue panels that reduce bright white areas, and a phone-width layout capped at 480 CSS pixels. Forecast hours expand into touch-friendly cards. Presentation changes do not modify weather, pressure, fishing-score, window, or lure rules.
 
 The original uploaded logo is preserved in `public/brand/wtf-original.jpg`. Bass artwork was generated for this app and packaged as a 151 KB WebP for mobile delivery. Public asset paths remain relative for GitHub Pages. The decorative fish image is not presented as a photograph of the selected fishing location.

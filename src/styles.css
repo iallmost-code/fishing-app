@@ -3,15 +3,15 @@
 :root {
   font-family: "DM Sans", ui-sans-serif, system-ui, sans-serif;
   color: #153b48;
-  background: #d9f0f5;
+  background: #bfd8de;
   font-synthesis: none;
   font-weight: 400;
   --blue: #087cd2;
   --blue-2: #087cd2;
   --blue-3: #086aab;
-  --ink-2: #637d87;
-  --line: #deeceb;
-  --soft: #f0f8f8;
+  --ink-2: #486674;
+  --line: #b7d3d3;
+  --soft: #cce2e4;
   --accent: #008bb3;
   --good: #16845e;
   --danger: #b91c1c;
@@ -20,8 +20,12 @@
   --lime: #c5f363;
   --orange: #ffbf66;
   --ink: #143c4b;
-  --muted: #637d87;
-  --surface: #f0f8f8;
+  --muted: #486674;
+  --surface: #c4dfe1;
+  --panel: #d9e9e4;
+  --panel-raised: #e2ece5;
+  --chrome: #d0e5e3;
+  --field: #e0ece8;
   --score-color: #13b48e;
   --score-soft: #e0f8ef;
   --score-ink: #097553;
@@ -101,8 +105,8 @@ a.primary-button:active {
   min-width: 0;
 }
 .card {
-  background: white;
-  border: 1px solid #deeceb;
+  background: var(--panel);
+  border: 1px solid var(--line);
   border-radius: 23px;
   padding: 21px 18px;
   min-width: 0;
@@ -370,7 +374,7 @@ a.primary-button:active {
   align-items: center;
   justify-content: space-between;
   gap: 15px;
-  background: linear-gradient(120deg, #effcf4, #e3f8ee);
+  background: linear-gradient(120deg, #d5ecdf, #c7e5d9);
   border: 1px solid #ccebd9;
   border-radius: 23px;
   padding: 21px 19px;
@@ -649,14 +653,14 @@ a.primary-button:active {
   gap: 5px;
   font-size: 10px;
   font-weight: 750;
-  color: #117da8;
+  color: #076782;
   padding: 6px 0;
   min-height: 36px;
   white-space: nowrap;
 }
 .section-description {
   font-size: 11px;
-  color: #6e868d;
+  color: var(--muted);
   line-height: 1.6;
   margin: -7px 0 17px;
 }
@@ -680,7 +684,7 @@ a.primary-button:active {
   flex: 1;
   min-width: 58px;
   border: 1px solid #e9f0f1;
-  background: #f6fafb;
+  background: var(--panel-raised);
   border-radius: 15px;
   padding: 12px 7px;
   position: relative;
@@ -688,7 +692,7 @@ a.primary-button:active {
 }
 .hour > span {
   font-size: 9px;
-  color: #7b8e94;
+  color: var(--muted);
   font-weight: 600;
   white-space: nowrap;
 }
@@ -732,7 +736,7 @@ a.primary-button:active {
   display: flex;
   align-items: center;
   gap: 5px;
-  color: #91a0a5;
+  color: var(--muted);
   font-size: 8px;
   margin-top: 11px;
 }
@@ -744,18 +748,18 @@ a.primary-button:active {
   border: 1px solid #e1eeeb;
   border-radius: 17px;
   padding: 15px;
-  background: #f8fcfa;
+  background: var(--panel-raised);
 }
 .lure-0 {
-  background: linear-gradient(120deg, #eefaf0, #f6fcf2);
+  background: linear-gradient(120deg, #cde6d5, #dcebd8);
   border-color: #cfe9cd;
 }
 .lure-1 {
-  background: #f2f9fd;
+  background: #d2e5eb;
   border-color: #ddecf4;
 }
 .lure-2 {
-  background: #fffaf0;
+  background: #ede5cf;
   border-color: #f1e5ca;
 }
 .lure-top {
@@ -923,7 +927,7 @@ a.primary-button:active {
   color: #8b825f;
 }
 .empty-window {
-  background: #f3f8f7;
+  background: var(--panel-raised);
   border: 1px dashed #d6e6df;
   border-radius: 15px;
   padding: 16px;
@@ -941,7 +945,7 @@ a.primary-button:active {
 }
 .fine-print {
   font-size: 10px;
-  color: #7e959c;
+  color: var(--muted);
   line-height: 1.75;
   margin-top: 13px;
 }
@@ -1075,7 +1079,7 @@ a.primary-button:active {
   gap: 8px;
 }
 .pressure-grid > div {
-  background: #eff8fc;
+  background: var(--panel-raised);
   border: 1px solid #e2f0f4;
   border-radius: 13px;
   display: flex;
@@ -1180,7 +1184,7 @@ a.primary-button:active {
   gap: 8px;
 }
 .reason {
-  background: #f3f8f8;
+  background: var(--soft);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -1236,7 +1240,7 @@ a.primary-button:active {
   display: flex;
   align-items: center;
   justify-content: space-around;
-  background: #ffffffed;
+  background: #d0e5e3f5;
   backdrop-filter: blur(20px);
   border-top: 1px solid #dcebea;
   box-shadow: 0 -6px 25px #194f6310;
@@ -1256,7 +1260,7 @@ a.primary-button:active {
   flex: 1;
   font-size: 8px;
   font-weight: 650;
-  color: #8b9da5;
+  color: var(--muted);
   position: relative;
   padding: 0 3px;
 }
@@ -1271,7 +1275,7 @@ a.primary-button:active {
     color 0.15s;
 }
 .bottom-nav > button.active {
-  color: #0788ac;
+  color: #06677c;
   font-weight: 800;
 }
 .bottom-nav > button.active .nav-icon {
@@ -1288,18 +1292,18 @@ a.primary-button:active {
   bottom: -3px;
 }
 .bottom-nav > button.nav-spots.active {
-  color: #499840;
+  color: #2c703c;
 }
 .bottom-nav > button.nav-spots.active .nav-icon {
   background: #eef8de;
-  color: #499840;
+  color: #2c703c;
 }
 .bottom-nav > button.nav-forecast.active {
-  color: #df982f;
+  color: #895810;
 }
 .bottom-nav > button.nav-forecast.active .nav-icon {
   background: #fff3d8;
-  color: #df982f;
+  color: #895810;
 }
 .bottom-nav > button.nav-tackle.active {
   color: #9365c0;
@@ -1399,7 +1403,7 @@ a.primary-button:active {
 .muted {
   font-size: 12px;
   line-height: 1.8;
-  color: #718b95;
+  color: var(--muted);
 }
 .daily-grid {
   display: flex;
@@ -1419,14 +1423,14 @@ a.primary-button:active {
   border: 1px solid #dcecf0;
   border-radius: 17px;
   padding: 17px;
-  background: #f7fbfc;
+  background: var(--panel-raised);
   color: var(--ink);
   scroll-snap-align: center;
 }
 .day-card.selected {
   border: 2px solid #09a5bc;
   padding: 16px;
-  background: #f0fcfc;
+  background: #c6e4e4;
 }
 .day-title {
   display: flex;
@@ -1460,7 +1464,7 @@ a.primary-button:active {
   gap: 7px;
   margin: 15px 0;
   font-size: 10px;
-  color: #72909a;
+  color: var(--muted);
 }
 .day-weather svg {
   color: #e6af42;
@@ -1476,7 +1480,7 @@ a.primary-button:active {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
   font-size: 10px;
-  color: #728d98;
+  color: var(--muted);
 }
 .day-stats > span {
   display: flex;
@@ -1519,7 +1523,7 @@ a.primary-button:active {
   max-width: 92px;
   text-align: right;
   line-height: 1.6;
-  color: #8aa0a7;
+  color: var(--muted);
 }
 .forecast-hours {
   display: grid;
@@ -1529,7 +1533,7 @@ a.primary-button:active {
 .forecast-hour {
   border: 1px solid #e1eded;
   border-radius: 14px;
-  background: #fcfefe;
+  background: var(--panel-raised);
   overflow: hidden;
 }
 .forecast-hour > summary {
@@ -1563,7 +1567,7 @@ a.primary-button:active {
 }
 .forecast-hour-time small {
   font-size: 8px;
-  color: #8aa0a7;
+  color: var(--muted);
 }
 .forecast-hour-temp {
   margin-left: auto;
@@ -1581,7 +1585,7 @@ a.primary-button:active {
 }
 .forecast-hour[open] {
   border-color: #a9dce3;
-  background: #f7fdfd;
+  background: #cde3e3;
 }
 .forecast-hour[open] > summary > svg {
   transform: rotate(180deg);
@@ -1606,7 +1610,7 @@ a.primary-button:active {
   font-size: 7px;
   letter-spacing: 0.5px;
   font-weight: 750;
-  color: #8fa4ab;
+  color: var(--muted);
 }
 .hour-metrics strong {
   font-size: 11px;
@@ -1670,7 +1674,7 @@ a.primary-button:active {
   min-width: 0;
   border: 1px solid #d7edef;
   border-radius: 11px;
-  background: #f5fbfc;
+  background: var(--panel-raised);
   color: #6996a2;
   min-height: 44px;
   font-size: 10px;
@@ -1698,8 +1702,8 @@ a.primary-button:active {
   display: flex;
   align-items: center;
   gap: 6px;
-  background: #fff;
-  border: 1px solid #e3f0f1;
+  background: var(--panel);
+  border: 1px solid var(--line);
   color: #1285a8;
   min-height: 44px;
   padding: 10px 12px;
@@ -2350,7 +2354,7 @@ footer > span {
   max-width: 480px;
   z-index: -1;
   pointer-events: none;
-  background: #d6f1f4;
+  background: #b8dce1;
   overflow: hidden;
 }
 .page-bass-background > img {
@@ -2364,7 +2368,7 @@ footer > span {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, #dcf7ff08, #e9f8f5a8 60%, #eff9f5c9);
+  background: linear-gradient(180deg, #afdbe518, #bddcd9b8 60%, #c4dfd9d9);
 }
 .app-header {
   background: linear-gradient(115deg, #0577c5, #058fc6 65%, #06a0b8);
@@ -2464,7 +2468,7 @@ footer > span {
   bottom: 12px;
 }
 .location-bar {
-  background: #fffffff5;
+  background: var(--chrome);
 }
 .today-heading > span:first-child {
   color: #244e5a;
@@ -2483,7 +2487,7 @@ footer > span {
   color: #628c91;
 }
 .header-status {
-  background: #ecf8f8;
+  background: var(--chrome);
 }
 @media (max-width: 375px) {
   .brand-wordmark > strong {
