@@ -5,7 +5,7 @@ import { getWeather, type WeatherSnapshot } from "../services/weather";
 import { calculateFishingScore } from "../engine/fishingScore";
 import { scoreForecast } from "../engine/forecast";
 import { getFishingWindows } from "../engine/fishingWindows";
-import { getLureRecommendations } from "../engine/lureRecommendations";
+import { lurePlan, type PlanWater } from "../engine/lurePlan";
 import { dateKey, formatClock } from "../utils/format";
 import Sheet from "./Sheet";
 import ScoreRing from "./ScoreRing";
@@ -16,6 +16,14 @@ function directionsUrl(spot: WaterLocation) {
   return /iPhone|iPad|iPod/.test(navigator.userAgent)
     ? `https://maps.apple.com/?daddr=${dest}&q=${encodeURIComponent(spot.name)}`
     : `https://www.google.com/maps/dir/?api=1&destination=${dest}`;
+}
+
+function waterFor(spot: WaterLocation): PlanWater | undefined {
+  if (spot.type === "river") return "river";
+  if (spot.type === "pond") return "pond";
+  if (spot.type === "park")
+    return spot.water?.includes("lake") ? "lake" : spot.water?.[0];
+  return spot.type === "lake" || spot.type === "reservoir" ? "lake" : undefined;
 }
 
 export default function SpotSheet({
@@ -52,7 +60,7 @@ export default function SpotSheet({
           (h) => dateKey(h.time, tz) === today && Date.parse(h.time) >= now,
         ),
       )[0],
-      lure = getLureRecommendations(weather, score.pressure)[0];
+      lure = lurePlan(weather, scoreForecast(weather), waterFor(spot))[0];
     summary = (
       <div className="spot-score">
         <ScoreRing score={score.score} label={score.label} size={84} />
@@ -68,6 +76,8 @@ export default function SpotSheet({
           {lure && (
             <p>
               Throw <b>{lure.name}</b> · {lure.color}
+              <br />
+              {lure.target}
             </p>
           )}
           <p className="muted">Pressure {score.pressure.label.toLowerCase()}</p>

@@ -21,6 +21,7 @@ import ScoreReasons from "../components/ScoreReasons";
 import BiteScoreCard from "../components/BiteScoreCard";
 import ConditionsCard from "../components/ConditionsCard";
 import LurePicks from "../components/LurePicks";
+import { lurePlan } from "../engine/lurePlan";
 import HourlyPreview from "../components/HourlyPreview";
 export default function TodayPage({
   weather,
@@ -103,7 +104,11 @@ export default function TodayPage({
         timezone={weather.timezone}
         onForecast={onForecast}
       />
-      <LurePicks lures={lures} />
+      <LurePicks
+        lures={lures}
+        plan={lurePlan(weather, allHours)}
+        timezone={weather.timezone}
+      />
       <section className="card">
         <div className="section-head">
           <div>
