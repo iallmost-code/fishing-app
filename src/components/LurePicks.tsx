@@ -1,6 +1,20 @@
 import { Fish, ArrowUpRight, Sparkles } from "lucide-react";
 import type { LureRecommendation } from "../engine/lureRecommendations";
-export default function LurePicks({ lures }: { lures: LureRecommendation[] }) {
+import type { LurePlanStop } from "../engine/lurePlan";
+import { formatClock } from "../utils/format";
+export default function LurePicks({
+  lures,
+  plan,
+  timezone,
+}: {
+  lures: LureRecommendation[];
+  /** Rest-of-day plan; falls back to right-now picks when the day is over. */
+  plan: LurePlanStop[];
+  timezone: string;
+}) {
+  const items: (LureRecommendation & Partial<LurePlanStop>)[] = plan.length
+    ? plan
+    : lures;
   return (
     <section className="card lure-card">
       <div className="section-head">
@@ -13,11 +27,16 @@ export default function LurePicks({ lures }: { lures: LureRecommendation[] }) {
         </span>
       </div>
       <p className="section-description">
-        Your best bass picks for these conditions.
+        {plan.length
+          ? "What to throw and where, for the rest of today."
+          : "Your best bass picks for these conditions."}
       </p>
       <div className="lure-list">
-        {lures.map((lure, i) => (
-          <article className={`lure lure-${i}`} key={lure.name}>
+        {items.map((lure, i) => (
+          <article
+            className={`lure lure-${i % 3}`}
+            key={lure.start ?? lure.name}
+          >
             <div className="lure-top">
               <span className="lure-art" aria-hidden="true">
                 <Fish size={35} strokeWidth={1.4} />
@@ -25,7 +44,15 @@ export default function LurePicks({ lures }: { lures: LureRecommendation[] }) {
               </span>
               <div className="lure-title">
                 <span className="lure-rank">
-                  {i === 0 ? (
+                  {lure.period ? (
+                    <>
+                      {lure.prime && <Sparkles size={11} />}
+                      {lure.prime ? "PRIME · " : ""}
+                      {lure.period.toUpperCase()} ·{" "}
+                      {formatClock(lure.start, timezone, true)}–
+                      {formatClock(lure.end, timezone, true)}
+                    </>
+                  ) : i === 0 ? (
                     <>
                       <Sparkles size={11} />
                       TOP PICK
