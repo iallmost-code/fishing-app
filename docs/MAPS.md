@@ -11,8 +11,6 @@ Provider checks performed 2026-10-03:
 - No API key enters browser code. Attribution supplied by the hosted style is retained through MapLibre's attribution control, covering OpenFreeMap, OpenMapTiles, and OpenStreetMap.
 - The map is a basemap, not a verified fishing-access or nearby-water database. Large map code is isolated in its own lazy chunk so Home does not pay that download cost.
 
-## Deferred nearby-water discovery
+## Nearby water
 
-No fake water markers are shown. Discovery is explicitly pending and remains the next phase after these first five features. Before implementing, verify current Overpass instance policy, rate and resource limits, attribution and CORS behavior. Public Overpass instances should not be treated as an unlimited production backend. Prefer a read-only query service with caching, throttling and provider isolation under `src/services/water/`.
-
-A normalized model should carry provider ID, name (or explicitly unnamed), lake/pond/reservoir/river/stream type, centroid coordinates, optional approximate size, distance and favorite state. OpenStreetMap presence does not establish legal/public fishing access. Spot-specific weather should reuse `getWeather` and the existing fishing/lure/window engines. Actual favorites and records follow in tackle/catch/storage phases.
+Implemented in `src/services/water/`; see the README's "Water data" section. Public Overpass instances are shared and rate limited, so lookups are capped at 25 miles, cached for 24 hours per area, and fall back to a second instance.

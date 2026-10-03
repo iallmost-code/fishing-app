@@ -1,14 +1,26 @@
-/** Future provider records; presence does not imply public/legal fishing access. */
 export type WaterType =
-  "lake" | "pond" | "reservoir" | "river" | "stream" | "unknown";
+  | "lake"
+  | "pond"
+  | "reservoir"
+  | "river"
+  | "boat-ramp"
+  | "pier"
+  | "fishing-spot"
+  | "park";
+/**
+ * A place to fish. Presence in OpenStreetMap does not establish legal or
+ * public access; `access` carries whatever the source states.
+ */
 export type WaterLocation = {
   id: string;
-  provider: string;
-  name: string | null;
+  source: "osm" | "alltrails";
+  name: string;
   type: WaterType;
   latitude: number;
   longitude: number;
-  approximateAreaSqMeters?: number;
   distanceMiles: number;
-  favorite: boolean;
+  /** Short facts shown as tags, e.g. "Fishing allowed", "Park fee". */
+  facts: string[];
+  /** Water types at a park (AllTrails): lake / river. */
+  water?: ("lake" | "river")[];
 };

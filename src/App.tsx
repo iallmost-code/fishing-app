@@ -1,162 +1,177 @@
 import { lazy, Suspense, useState } from "react";
-import { MapPin, LocateFixed, RefreshCw, Waves, X } from "lucide-react";
+import {
+  MapPin,
+  RefreshCw,
+  ChevronDown,
+  LocateOff,
+  Locate,
+} from "lucide-react";
 import { useFishingConditions } from "./hooks/useFishingConditions";
-import Navigation, { type AppTab } from "./components/Navigation";
-import LocationSearch from "./components/LocationSearch";
-import HomePage from "./pages/HomePage";
-import ScreenErrorBoundary from "./components/ScreenErrorBoundary";
+import { useNearbyWater } from "./hooks/useNearbyWater";
+import Navigation, { type AppTab, TABS } from "./components/Navigation";
+import LocationSheet from "./components/LocationSheet";
+import SpotSheet from "./components/SpotSheet";
+import type { WaterLocation } from "./models/waterLocation";
+import TodayPage from "./pages/TodayPage";
 import ForecastPage from "./pages/ForecastPage";
-import TacklePage from "./pages/TacklePage";
-import CatchesPage from "./pages/CatchesPage";
+import ScreenErrorBoundary from "./components/ScreenErrorBoundary";
 import { formatClock } from "./utils/format";
-const MapPage = lazy(() => import("./pages/MapPage"));
+const SpotsPage = lazy(() => import("./pages/SpotsPage"));
+
+function initialTab(): AppTab {
+  const hash = window.location.hash.slice(1);
+  return (TABS as readonly string[]).includes(hash)
+    ? (hash as AppTab)
+    : "Today";
+}
+
 export default function App() {
   const conditions = useFishingConditions(),
-    [tab, setTab] = useState<AppTab>(() => {
-      const hash = window.location.hash.slice(1);
-      return ["Home", "Map", "Forecast", "Tackle", "Catches"].includes(hash)
-        ? (hash as AppTab)
-        : "Home";
-    }),
-    [showLocation, setShowLocation] = useState(false);
+    [tab, setTab] = useState<AppTab>(initialTab),
+    [showLocation, setShowLocation] = useState(false),
+    [radius, setRadius] = useState(10),
+    [openSpot, setOpenSpot] = useState<WaterLocation | null>(null);
+  const { location, weather, loading, error, locationStatus } = conditions;
+  const water = useNearbyWater(location, radius);
   function navigate(next: AppTab) {
     setTab(next);
     window.history.replaceState(null, "", `#${next}`);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0 });
   }
-  const { location, weather, loading, error } = conditions;
+  const gpsLine =
+    locationStatus === "locating"
+      ? "Finding you…"
+      : location.source === "gps"
+        ? `GPS${location.accuracy ? ` · ±${Math.round(location.accuracy * 3.281)} ft` : ""}`
+        : locationStatus === "denied"
+          ? "Location off · tap to fix"
+          : location.source === "spot"
+            ? "Fishing spot"
+            : location.source === "manual"
+              ? "Searched town"
+              : "Default spot · tap to use GPS";
   return (
     <div className="app-shell">
-      <header className="hero">
-        <div className="brand-line">
-          <Waves size={23} />
-          <span>Fishing Companion</span>
-          <span className="brand-tag">READ THE WATER</span>
-        </div>
-        <div className="hero-top">
-          <div>
-            <button
-              className="location-heading"
-              onClick={() => setShowLocation(!showLocation)}
-            >
-              <MapPin size={15} />
+      <header className="top-bar">
+        <button
+          className="place-button"
+          onClick={() => setShowLocation(true)}
+          aria-label="Change location"
+        >
+          {locationStatus === "denied" ? (
+            <LocateOff size={20} />
+          ) : location.source === "gps" ? (
+            <Locate size={20} />
+          ) : (
+            <MapPin size={20} />
+          )}
+          <span>
+            <strong>
               {location.name}
-            </button>
-            <h1>
-              {tab === "Home"
-                ? "Make your next cast count."
-                : tab === "Forecast"
-                  ? "Find your best bite."
-                  : tab === "Map"
-                    ? "Find your next spot."
-                    : tab === "Tackle"
-                      ? "Your tackle box."
-                      : "Your catch log."}
-            </h1>
-            <p className="coords">
-              {location.source === "gps"
-                ? "Live GPS"
-                : location.source === "manual"
-                  ? "Selected location"
-                  : "Fallback location"}{" "}
-              · {location.latitude.toFixed(4)}, {location.longitude.toFixed(4)}
-            </p>
-          </div>
-          <div className="header-buttons">
-            <button
-              className="round-btn"
-              onClick={() => void conditions.refresh()}
-              disabled={loading}
-              aria-label="Refresh weather"
-            >
-              <RefreshCw size={19} className={loading ? "spin" : ""} />
-            </button>
-            <button
-              className="round-btn"
-              onClick={() => setShowLocation(!showLocation)}
-              aria-label="Choose location"
-              aria-expanded={showLocation}
-            >
-              {showLocation ? <X size={20} /> : <LocateFixed size={20} />}
-            </button>
-          </div>
-        </div>
-        {conditions.offline && (
-          <div className="notice" role="status">
-            You're offline.{" "}
-            {weather
-              ? "Previously loaded weather is shown below."
-              : "Live weather needs a connection."}
-          </div>
-        )}
-        {loading && (
-          <div className="status" role="status">
-            <RefreshCw className="spin" size={16} />
-            Loading conditions…
-          </div>
-        )}
-        {error && (
-          <div className="error" role="alert">
-            {error}
-            {weather ? " Previous weather remains visible." : ""}
-            <button onClick={() => void conditions.refresh()}>Retry</button>
-          </div>
-        )}
-        {weather && (
-          <div className="weather-freshness">
-            {error || conditions.offline ? "PREVIOUS WEATHER" : "LIVE WEATHER"}{" "}
-            · Updated {formatClock(weather.fetchedAt, weather.timezone)} ·{" "}
-            {weather.timezone}
-          </div>
-        )}
+              <ChevronDown size={16} />
+            </strong>
+            <small className={locationStatus === "denied" ? "warn" : ""}>
+              {gpsLine}
+              {weather && !loading
+                ? ` · ${formatClock(weather.fetchedAt, weather.timezone)}`
+                : ""}
+            </small>
+          </span>
+        </button>
+        <button
+          className="icon-button"
+          onClick={() =>
+            location.source === "gps"
+              ? void conditions.useGPS()
+              : void conditions.refresh()
+          }
+          disabled={loading || locationStatus === "locating"}
+          aria-label="Refresh"
+        >
+          <RefreshCw
+            size={20}
+            className={loading || locationStatus === "locating" ? "spin" : ""}
+          />
+        </button>
       </header>
-      <main className="screen" id="main-content">
-        {showLocation && (
-          <div className="content">
-            <LocationSearch conditions={conditions} />
-          </div>
-        )}
-        {tab === "Map" ? (
+      {conditions.offline && (
+        <div className="banner" role="status">
+          You're offline{weather ? " — showing the last weather." : "."}
+        </div>
+      )}
+      {error && (
+        <div className="banner error" role="alert">
+          {error}
+          <button onClick={() => void conditions.refresh()}>Retry</button>
+        </div>
+      )}
+      <main className="screen">
+        {tab === "Spots" ? (
           <ScreenErrorBoundary>
             <Suspense fallback={<div className="card">Loading map…</div>}>
-              <MapPage conditions={conditions} />
+              <SpotsPage
+                conditions={conditions}
+                water={water}
+                radius={radius}
+                onRadius={setRadius}
+                onOpenSpot={setOpenSpot}
+              />
             </Suspense>
           </ScreenErrorBoundary>
-        ) : tab === "Tackle" ? (
-          <TacklePage />
-        ) : tab === "Catches" ? (
-          <CatchesPage />
         ) : weather ? (
           tab === "Forecast" ? (
             <ForecastPage weather={weather} />
           ) : (
-            <HomePage
+            <TodayPage
               weather={weather}
+              water={water}
               onForecast={() => navigate("Forecast")}
+              onSpots={() => navigate("Spots")}
+              onOpenSpot={setOpenSpot}
             />
           )
-        ) : !loading ? (
-          <section className="card empty-page">
-            <Waves size={38} />
-            <h2>Weather is unavailable</h2>
-            <p>Choose a location or retry when your connection returns.</p>
+        ) : loading ? (
+          <div className="skeleton" aria-label="Loading conditions">
+            <div />
+            <div />
+            <div />
+          </div>
+        ) : (
+          <section className="card empty">
+            <h2>No weather yet</h2>
+            <p>Check your connection, or pick a different spot.</p>
             <button
               className="primary-button"
               onClick={() => void conditions.refresh()}
             >
-              Retry weather
+              Try again
             </button>
           </section>
-        ) : null}
+        )}
       </main>
-      <footer>
-        Weather by{" "}
-        <a href="https://open-meteo.com/" target="_blank" rel="noreferrer">
-          Open-Meteo
-        </a>
-        . Fishing scores are guidance, not a guarantee.
-      </footer>
       <Navigation tab={tab} onChange={navigate} />
+      {openSpot && (
+        <SpotSheet
+          spot={openSpot}
+          onClose={() => setOpenSpot(null)}
+          onFishHere={(spot) => {
+            setOpenSpot(null);
+            void conditions.refresh({
+              latitude: spot.latitude,
+              longitude: spot.longitude,
+              source: "spot",
+              name: spot.name,
+            });
+            navigate("Today");
+          }}
+        />
+      )}
+      {showLocation && (
+        <LocationSheet
+          conditions={conditions}
+          onClose={() => setShowLocation(false)}
+        />
+      )}
     </div>
   );
 }

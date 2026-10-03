@@ -1,18 +1,7 @@
-import {
-  House,
-  Map,
-  ChartNoAxesCombined,
-  BriefcaseBusiness,
-  Fish,
-} from "lucide-react";
-export type AppTab = "Home" | "Map" | "Forecast" | "Tackle" | "Catches";
-const tabs = [
-  { name: "Home", Icon: House },
-  { name: "Map", Icon: Map },
-  { name: "Forecast", Icon: ChartNoAxesCombined },
-  { name: "Tackle", Icon: BriefcaseBusiness },
-  { name: "Catches", Icon: Fish },
-] as const;
+import { Gauge, MapPinned, CalendarDays } from "lucide-react";
+export const TABS = ["Today", "Spots", "Forecast"] as const;
+export type AppTab = (typeof TABS)[number];
+const icons = { Today: Gauge, Spots: MapPinned, Forecast: CalendarDays };
 export default function Navigation({
   tab,
   onChange,
@@ -22,17 +11,20 @@ export default function Navigation({
 }) {
   return (
     <nav className="bottom-nav" aria-label="Main navigation">
-      {tabs.map(({ name, Icon }) => (
-        <button
-          key={name}
-          className={name === tab ? "active" : ""}
-          aria-current={name === tab ? "page" : undefined}
-          onClick={() => onChange(name)}
-        >
-          <Icon size={22} />
-          <span>{name}</span>
-        </button>
-      ))}
+      {TABS.map((name) => {
+        const Icon = icons[name];
+        return (
+          <button
+            key={name}
+            className={name === tab ? "active" : ""}
+            aria-current={name === tab ? "page" : undefined}
+            onClick={() => onChange(name)}
+          >
+            <Icon size={24} />
+            <span>{name}</span>
+          </button>
+        );
+      })}
     </nav>
   );
 }
