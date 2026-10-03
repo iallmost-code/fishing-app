@@ -80,10 +80,17 @@ export default function AppHeader({
           fetchPriority="high"
         />
         <div className="bass-shade" />
-        <div className="bass-tab-label">
-          <Fish size={14} />
-          {tab === "Today" ? "YOUR DAY ON THE WATER" : tab.toUpperCase()}
-        </div>
+        {tab === "Today" ? (
+          <div className="bass-home-copy">
+            <span>The water is calling</span>
+            <h2>Chase the bite.</h2>
+          </div>
+        ) : (
+          <div className="bass-tab-label">
+            <Fish size={14} />
+            {tab.toUpperCase()}
+          </div>
+        )}
       </div>
       <div className="location-bar">
         <button
