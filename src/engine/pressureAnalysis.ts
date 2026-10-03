@@ -29,19 +29,35 @@ export function pressureAt(
   const now = Date.parse(time);
   const delta = (n: number) => {
     const target = now - n * 3600000;
-    // Never substitute a distant hour or bridge missing pressure readings.
-    const previous = hours.find(
-      (h) =>
-        Math.abs(Date.parse(h.time) - target) <= 20 * 60000 &&
-        h.pressureHpa !== null,
-    );
-    return current !== null && previous?.pressureHpa != null
-      ? current - previous.pressureHpa
-      : null;
+    const previous = pressureNear(hours, target);
+    return current !== null && previous !== null ? current - previous : null;
   };
   const oneHour = delta(1),
     threeHour = delta(3),
     sixHour = delta(6);
   const rate = threeHour !== null ? threeHour / 3 : oneHour;
   return { oneHour, threeHour, sixHour, rate, label: classifyPressure(rate) };
+}
+
+/**
+ * Pressure at an arbitrary time from hourly readings: an exact reading
+ * within 20 minutes, otherwise a straight line between the readings either
+ * side when they are no more than an hour apart. Never bridges missing hours.
+ */
+export function pressureNear(
+  hours: WeatherHour[],
+  target: number,
+): number | null {
+  const readings = hours
+    .filter((h) => h.pressureHpa !== null)
+    .map((h) => ({ t: Date.parse(h.time), p: h.pressureHpa! }));
+  const close = readings.find((r) => Math.abs(r.t - target) <= 20 * 60000);
+  if (close) return close.p;
+  const before = readings.filter((r) => r.t < target).at(-1),
+    after = readings.find((r) => r.t > target);
+  if (!before || !after || after.t - before.t > 3600000 * 1.1) return null;
+  return (
+    before.p +
+    ((after.p - before.p) * (target - before.t)) / (after.t - before.t)
+  );
 }

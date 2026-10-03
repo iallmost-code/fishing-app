@@ -50,6 +50,17 @@ describe("pressure", () => {
     );
     expect(p.threeHour).toBe(-3);
   });
+  it("still has a trend at half past the hour", () => {
+    // 16:30 → targets 15:30 / 13:30 / 10:30 fall between hourly readings.
+    const p = pressureAt(
+      hours,
+      new Date(start + 6.5 * 3600000).toISOString(),
+      1008.5,
+    );
+    expect(p.oneHour).toBeCloseTo(-1);
+    expect(p.threeHour).toBeCloseTo(-3);
+    expect(p.label).toBe("Falling");
+  });
   it("classifies all five trends", () => {
     expect([-1.2, -0.25, 0, 0.25, 1.2].map(classifyPressure)).toEqual([
       "Rapidly Falling",

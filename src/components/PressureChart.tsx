@@ -36,15 +36,7 @@ export default function PressureChart({
   );
   const selected = points[selectedIndex];
   if (points.length < 2 || !selected)
-    return (
-      <section className="card">
-        <h3>Barometric pressure</h3>
-        <p>
-          Pressure history is unavailable. The chart needs at least two real
-          readings.
-        </p>
-      </section>
-    );
+    return <p className="muted">Pressure history is unavailable right now.</p>;
   const start = now - 12 * 3600000,
     end = now + 12 * 3600000;
   const min = Math.min(...points.map((p) => hpaToInHg(p.pressure))) - 0.025,
@@ -58,22 +50,7 @@ export default function PressureChart({
   );
   const historyHours = (now - Date.parse(points[0].time)) / 3600000;
   return (
-    <section className="card pressure-chart">
-      <div className="section-head">
-        <div>
-          <span className="kicker">12 HOURS BACK · 12 HOURS AHEAD</span>
-          <h3>Barometric pressure</h3>
-        </div>
-        <span className="trend-badge">
-          {classifyPressure(
-            pressureAt(
-              weather.hourly,
-              weather.current.time,
-              weather.current.pressureHpa,
-            ).rate,
-          )}
-        </span>
-      </div>
+    <div className="pressure-chart">
       <div className="chart-readout" aria-live="polite">
         <strong>
           {formatNumber(hpaToInHg(selected.pressure), 2, " inHg")}
@@ -168,8 +145,8 @@ export default function PressureChart({
           +12h
         </text>
       </svg>
-      <label className="chart-slider-label" htmlFor="pressure-hour">
-        Explore pressure by hour
+      <label className="sr-only" htmlFor="pressure-hour">
+        Pressure by hour
       </label>
       <input
         id="pressure-hour"
@@ -184,7 +161,7 @@ export default function PressureChart({
       <div className="chart-legend">
         <span>
           <i className="falling" />
-          Falling / Rapidly Falling
+          Falling
         </span>
         <span>
           <i className="stable" />
@@ -192,19 +169,10 @@ export default function PressureChart({
         </span>
         <span>
           <i className="rising" />
-          Rising / Rapidly Rising
+          Rising
         </span>
       </div>
-      {historyHours < 11.5 && (
-        <p className="fine-print">
-          Only {Math.max(0, Math.floor(historyHours))} hours of real history are
-          available. Missing readings are not interpolated.
-        </p>
-      )}
-      <p className="fine-print">
-        Solid: recent model history · Dashed: forecast · Sea-level pressure. One
-        factor in the fishing score.
-      </p>
-    </section>
+      <p className="fine-print">Solid: past 12 hours · Dashed: forecast</p>
+    </div>
   );
 }

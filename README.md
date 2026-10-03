@@ -14,24 +14,27 @@ npm run build
 
 GitHub Pages retains the relative Vite base and existing deployment workflow. The workflow now uses the committed lockfile and runs checks/tests before building. Navigation uses hashes, so refreshing a tab works on Pages without server rewrites.
 
-## Implemented in this phase
+## What's in the app
 
-- Dedicated Home, Map, Forecast, Tackle and Catches screens, with touch-sized bottom navigation. Tackle and Catches clearly identify the subsequent storage phase.
-- Home condition icon, temperature, wind/direction, cloud/rain probability, pressure changes, sun times, score explanations, top three lure picks and remaining-day continuous windows.
-- Pressure graph with 12 hours of model history and 12 forecast hours, a current marker, rising/falling/stable segments, inHg units and a keyboard/touch slider. Missing history is identified.
-- Primary/secondary windows from consecutive strong hours, without random precision.
-- Seven daily outlook cards and selected-day hourly conditions, with per-hour score explanations, full weather breakdown and timezone-aware formatting.
-- Lazy-loaded MapLibre/OpenFreeMap map, GPS permission/error states, manual geocoding, real radius geometry, zoom/recenter and explicit nearby-water discovery pending state.
-- Weather timeouts, nullable normalization, stale-request protection, an offline notice, prior-data labels after failure, missing-data handling and map screen error recovery.
+Phone-only layout with three tabs:
 
-## Next phases
+- **Today:** fishing score, best bite window, pressure/wind/sun, the top lure (more on tap), the next 12 hours, the closest spots, and fold-out pressure graph and score breakdown.
+- **Spots:** map plus list of nearby water within 5/10/25 miles, filterable by lakes, rivers, and ramps & piers. Tap a spot for its own score, best bite and lure, directions, or "Fish here".
+- **Forecast:** 7 day buttons with scores, a day summary, and an hourly list that expands to show why each hour scored the way it did.
 
-Nearby-water provider verification/integration, persistent tackle and catch entry, Supabase data layer, and PWA/offline forecast caching are not claimed complete in this first-five-feature delivery. The app currently holds weather and precise location in memory only. Offline weather is available while the already-loaded session remains open; reopening offline requires the later PWA phase.
+GPS is requested on launch. The last location is remembered (rounded to about 100 m) so the app opens on your water. If the high-accuracy fix times out it retries with a network fix, and a blocked permission tells you how to turn it back on.
+
+## Water data
+
+- **Live:** named lakes, ponds, reservoirs and rivers, boat ramps, fishing piers and fishing spots from OpenStreetMap via the public Overpass API (`src/services/water/overpass.ts`). Private water is hidden. Results are cached per area for 24 hours, and a second Overpass server is tried if the first fails.
+- **Built in:** 23 parks within about 50 miles of Monroe that AllTrails lists for fishing (`src/services/water/knownSpots.ts`). Only facts are kept: park name, lake/river, fees and accessible paths. Coordinates come from OpenStreetMap and were checked against AllTrails' distances. These show instantly and work offline; a live lake inside one of these parks is folded into the park. Outside this area the list adds nothing.
+
+Being on the map doesn't mean public access.
 
 See [fishing formulas](docs/FISHING_LOGIC.md) and [map provider notes](docs/MAPS.md).
 
 ## Mobile preview
 
-Browser screenshots at 412 × 915 pixels, using actual Monroe weather at validation time:
+Phone screenshots at 390 × 844 (Spots uses sample live-water data):
 
 [Home](docs/mobile-home.png) · [Map](docs/mobile-map.png)
