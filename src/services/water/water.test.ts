@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { normalizeOverpass, overpassQuery } from "./overpass";
 import { mergeSpots } from "./index";
 import { knownSpotsNear } from "./knownSpots";
+import { GUIDE_SPOTS } from "./guideSpots";
 
 const monroe = { latitude: 33.7948, longitude: -83.7132 };
 
@@ -166,10 +167,11 @@ describe("guide spots", () => {
     const hartwell = knownSpotsNear({ latitude: 34.37, longitude: -82.92 }, 25);
     expect(hartwell.map((s) => s.name)).toContain("Hart State Park");
   });
-  it("keeps a live lake separate from an unconfirmed park next to it", () => {
-    const park = knownSpotsNear(monroe, 25).find(
-      (s) => s.name === "Felker Park",
+  it("keeps a live lake separate from a park with no known water", () => {
+    const mathews = knownSpotsNear(monroe, 25).find(
+      (s) => s.name === "Mathews Park",
     )!;
+    const park = { ...mathews, water: undefined };
     const merged = mergeSpots(
       [park],
       [
@@ -187,5 +189,12 @@ describe("guide spots", () => {
       25,
     );
     expect(merged).toHaveLength(2);
+  });
+  it("has no park with unconfirmed fishing and no known water", () => {
+    for (const s of GUIDE_SPOTS)
+      expect(
+        s.facts.includes("Fishing unconfirmed") && !s.water?.length,
+        s.name,
+      ).toBe(false);
   });
 });
