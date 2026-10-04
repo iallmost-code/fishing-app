@@ -595,3 +595,106 @@ footer a {
   background: var(--panel);
   color: #94e4f4;
 }
+
+/* Two present-time choices, with the color visible before the method. */
+.current-lure-list {
+  display: grid;
+  gap: 12px;
+}
+.current-lure {
+  padding: 16px;
+  border: 1px solid #356859;
+  border-radius: 17px;
+  background: linear-gradient(125deg, #103c35, #123b36);
+}
+.current-lure-1 {
+  border-color: #356474;
+  background: #103745;
+}
+.current-lure-rank {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: #a1edc6;
+}
+.current-lure-1 .current-lure-rank {
+  color: #a4dff0;
+}
+.current-lure h4 {
+  font-size: 20px;
+  line-height: 1.2;
+  margin-top: 8px;
+}
+.current-lure-color {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.current-lure-color > span {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: #acd0c6;
+}
+.current-lure-color strong {
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: #215640;
+  color: #e5f9df;
+  font-size: 14px;
+}
+.current-lure-1 .current-lure-color strong {
+  background: #23556a;
+  color: #e3f5fb;
+}
+.current-lure-when {
+  margin-top: 12px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: #d7ece3;
+}
+.current-lure-method {
+  margin: 12px 0 0;
+  display: grid;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid #44776a66;
+}
+.current-lure-method > div {
+  display: grid;
+  grid-template-columns: 55px minmax(0, 1fr);
+  gap: 8px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.current-lure-method dt {
+  color: #a7c9c0;
+  font-weight: 700;
+}
+.current-lure-method dd {
+  margin: 0;
+  color: #d7ece3;
+}
+.current-lure-why summary {
+  cursor: pointer;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  color: #a6e3d2;
+  font-size: 12px;
+  font-weight: 650;
+}
+.current-lure-why summary::after {
+  content: "+";
+  margin-left: auto;
+}
+.current-lure-why[open] summary::after {
+  content: "−";
+}
+.current-lure-why p {
+  color: #c1dad3;
+  font-size: 12px;
+  line-height: 1.6;
+}

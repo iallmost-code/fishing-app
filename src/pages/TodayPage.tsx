@@ -9,7 +9,8 @@ import {
 import { calculateFishingScore } from "../engine/fishingScore";
 import { scoreForecast } from "../engine/forecast";
 import { getFishingWindows } from "../engine/fishingWindows";
-import { getLureRecommendations } from "../engine/lureRecommendations";
+import { getCurrentLurePicks } from "../engine/currentLures";
+import { useCurrentTime } from "../hooks/useCurrentTime";
 import { hpaToInHg, type WeatherSnapshot } from "../services/weather";
 import { dateKey, formatClock, formatNumber } from "../utils/format";
 import type { WaterLocation } from "../models/waterLocation";
@@ -21,7 +22,6 @@ import ScoreReasons from "../components/ScoreReasons";
 import BiteScoreCard from "../components/BiteScoreCard";
 import ConditionsCard from "../components/ConditionsCard";
 import LurePicks from "../components/LurePicks";
-import { lurePlan } from "../engine/lurePlan";
 import HourlyPreview from "../components/HourlyPreview";
 export default function TodayPage({
   weather,
@@ -38,8 +38,8 @@ export default function TodayPage({
   onOpenSpot: (spot: WaterLocation) => void;
   stale: boolean;
 }) {
+  const currentTime = useCurrentTime();
   const score = calculateFishingScore(weather),
-    lures = getLureRecommendations(weather, score.pressure),
     allHours = scoreForecast(weather);
   const today = dateKey(weather.current.time, weather.timezone),
     now = Date.parse(weather.current.time);
@@ -105,8 +105,9 @@ export default function TodayPage({
         onForecast={onForecast}
       />
       <LurePicks
-        lures={lures}
-        plan={lurePlan(weather, allHours)}
+        advice={getCurrentLurePicks(weather, currentTime)}
+        conditionsTime={weather.current.time}
+        stale={stale}
         timezone={weather.timezone}
       />
       <section className="card">

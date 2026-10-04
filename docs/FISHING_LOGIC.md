@@ -45,4 +45,16 @@ Daily score is the rounded average of available hourly scores for that local day
 
 ## Lures
 
-Keep the existing three-pick bass engine. Wind ≥6 mph supports chatterbait; cloud cover ≥50% or falling pressure selects a topwater option; swimbait is a broad forage option; measured wind <6 mph allows a slower Texas rig. Every pick retains color, retrieve, target, and reason. Missing wind does not pretend conditions are calm. Pressure is a contextual input, never a guarantee or a claim about light level.
+Home and spot details use `getCurrentLurePicks` in `src/engine/currentLures.ts`. It returns exactly two distinct bass choices for the present time at the selected location: a starting lure and a backup with an explicit reason to switch. Each includes color, when, retrieve, target and reason. The legacy forecast-plan and three-pick exports remain available, but are not rendered on Home.
+
+A minute clock and visibility-change update keep the local period current while the app stays open. Use sunrise/sunset for that local date; use local clock periods when sun times are missing. Darkness applies before sunrise minus 30 minutes and after sunset plus 30 minutes. Dawn/evening are the existing sunrise/sunset-adjacent periods, never future forecast segments.
+
+Priority rules:
+
+- Darkness: black/blue Texas rig in cover; black spinnerbait with reported wind ≥8 mph, otherwise a conditional black buzzbait only if surface feeding is observed.
+- Observed precipitation >0 or wind ≥8 mph: spinnerbait for rain, chatterbait for wind; Texas rig as the cover/slower backup. Color is white/chartreuse with cloud ≥70%, otherwise white/shad.
+- Dawn/evening plus measured wind <8 mph: walking topwater if surface feeding is observed, with a paddle-tail swimbait backup.
+- Daylight with cloud <50%: green-pumpkin Texas rig in shaded cover, with a natural-shad swimbait backup.
+- Other or incomplete conditions: natural-shad swimbait and green-pumpkin Texas rig, with observation-based instructions.
+
+Use weather only when its current timestamp is no more than 90 minutes old (allowing 15 minutes of provider clock skew). Older readings are identified and ignored for wind/cloud/rain choices. Missing wind never means calm. Air temperature is not water temperature, rain probability is not rainfall, and pressure trends do not establish light or water clarity. Colors are starting options because water clarity and forage have not been supplied; advice is conditional and does not promise a bite.

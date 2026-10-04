@@ -5,7 +5,9 @@ import { getWeather, type WeatherSnapshot } from "../services/weather";
 import { calculateFishingScore } from "../engine/fishingScore";
 import { scoreForecast } from "../engine/forecast";
 import { getFishingWindows } from "../engine/fishingWindows";
-import { lurePlan, type PlanWater } from "../engine/lurePlan";
+import type { PlanWater } from "../engine/lurePlan";
+import { getCurrentLurePicks } from "../engine/currentLures";
+import { useCurrentTime } from "../hooks/useCurrentTime";
 import { dateKey, formatClock } from "../utils/format";
 import Sheet from "./Sheet";
 import ScoreRing from "./ScoreRing";
@@ -35,6 +37,7 @@ export default function SpotSheet({
   onClose: () => void;
   onFishHere: (spot: WaterLocation) => void;
 }) {
+  const currentTime = useCurrentTime();
   const [weather, setWeather] = useState<WeatherSnapshot | null>(null),
     [failed, setFailed] = useState(false);
   useEffect(() => {
@@ -60,7 +63,7 @@ export default function SpotSheet({
           (h) => dateKey(h.time, tz) === today && Date.parse(h.time) >= now,
         ),
       )[0],
-      lure = lurePlan(weather, scoreForecast(weather), waterFor(spot))[0];
+      lure = getCurrentLurePicks(weather, currentTime, waterFor(spot)).picks[0];
     summary = (
       <div className="spot-score">
         <ScoreRing score={score.score} label={score.label} size={84} />
@@ -75,7 +78,7 @@ export default function SpotSheet({
           </p>
           {lure && (
             <p>
-              Throw <b>{lure.name}</b> · {lure.color}
+              Now: <b>{lure.name}</b> · {lure.color}
               <br />
               {lure.target}
             </p>

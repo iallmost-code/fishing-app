@@ -18,7 +18,7 @@ GitHub Pages retains the relative Vite base and existing deployment workflow. Th
 
 Phone-only layout with three tabs:
 
-- **Today:** fishing score, best bite window, pressure/wind/sun, the top three lure picks with their reasons, the next 12 hours, the closest spots, and an interactive pressure graph and score breakdown.
+- **Today:** fishing score, best bite window, pressure/wind/sun, two current-time lure options with clear colors, when to use each, retrieves and reasons, the next 12 hours, the closest spots, and an interactive pressure graph and score breakdown.
 - **Spots:** map plus list of nearby water within 5/10/25 miles, filterable by lakes, rivers, and ramps & piers. Tap a spot for its own score, best bite and lure, directions, or "Fish here".
 - **Forecast:** seven daily outlook cards with scores, weather and bite windows, plus hourly cards that expand to show conditions and score explanations.
 
@@ -37,7 +37,7 @@ See [fishing formulas](docs/FISHING_LOGIC.md) and [map provider notes](docs/MAPS
 
 Phone screenshots at 412 × 915 using actual weather and nearby-water results at validation time:
 
-[Today](docs/mobile-home.png) · [Forecast](docs/mobile-forecast.png) · [Spots](docs/mobile-map.png)
+[Today](docs/mobile-home.png) · [Forecast](docs/mobile-forecast.png) · [Spots](docs/mobile-map.png) · [Lure picks](docs/mobile-lures.png)
 
 ## Mobile visual design
 
