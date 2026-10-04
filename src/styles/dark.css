@@ -1,0 +1,597 @@
+/* Night-lake palette: layout lives in styles.css; surface colors live here. */
+:root {
+  color-scheme: dark;
+  color: #f0f7f7;
+  background: #03151d;
+  --ink: #f0f7f7;
+  --muted: #aac7ce;
+  --ink-2: #aac7ce;
+  --surface: #041b23;
+  --panel: #092e38;
+  --panel-raised: #103b46;
+  --chrome: #062a35;
+  --field: #0e3540;
+  --line: #235460;
+  --soft: #123b45;
+  --accent: #56d9f3;
+  --aqua: #59e0dc;
+  --blue-2: #073747;
+  --blue-3: #052d38;
+  --lime: #b5f85b;
+  --good: #45e6ab;
+  --danger: #ffaaa0;
+  --score-color: #00df9c;
+  --score-soft: #0a403c;
+  --score-ink: #63efbe;
+  --amber: #ffcc69;
+  --amber-soft: #362a14;
+}
+button:focus-visible,
+a:focus-visible,
+summary:focus-visible,
+input:focus-visible {
+  outline-color: #65e1f5;
+}
+.app-shell {
+  box-shadow: 0 0 70px #0007;
+}
+.card {
+  background: linear-gradient(145deg, #0c333df5, #082c36fa);
+  border-color: var(--line);
+  box-shadow: 0 8px 24px #0002;
+}
+.page-bass-background {
+  background: var(--surface);
+}
+.page-bass-background > img {
+  opacity: 0.2;
+}
+.page-bass-background:after {
+  background: linear-gradient(180deg, #031b23a3, #041b23d9 55%, #041b23ec);
+}
+.app-header {
+  background: linear-gradient(115deg, #052d3a, #064358);
+}
+.bass-hero {
+  background: #052b3b;
+}
+.bass-shade,
+.home-header .bass-shade {
+  background:
+    linear-gradient(90deg, #02253565, transparent 80%),
+    linear-gradient(0deg, #031d2bbd, transparent 70%);
+}
+.bass-home-copy > span {
+  color: #a7f2dd;
+}
+.bass-tab-label {
+  background: #073847b8;
+  border-color: #70bddd70;
+}
+.location-bar {
+  background: #072c36f5;
+  border-color: var(--line);
+}
+.location-heading small,
+.location-heading > svg {
+  color: var(--muted);
+}
+.location-pin,
+.header-action {
+  background: #0b3c4a;
+  color: #56d9f3;
+  border: 1px solid #286071;
+}
+.locate-action {
+  background: #093e3e;
+  color: #6aecac;
+  border-color: #24645f;
+}
+.header-status {
+  background: var(--surface);
+}
+.notice,
+.banner,
+.map-error {
+  background: #3a2c16;
+  color: #ffda93;
+  border-color: #86682e;
+}
+.error {
+  background: #43292c;
+  color: #ffc4bc;
+  border-color: #8e5351;
+}
+.error button,
+.inline-error {
+  color: #ffb2a6;
+}
+.status {
+  background: #103f51;
+  color: #a3e8fa;
+}
+.today-heading > span:first-child {
+  color: var(--ink);
+}
+.data-pill {
+  color: #8ae8cd;
+}
+.data-pill i {
+  background: #10e39d;
+}
+.data-pill.is-stale {
+  color: #ffd184;
+}
+.eyebrow,
+.kicker {
+  color: #92e3d7;
+}
+.score-panel,
+.score-panel.tone-good,
+.score-panel.tone-fair,
+.score-panel.tone-poor {
+  background: linear-gradient(130deg, #093a3b, #06303a);
+  border-color: #257879;
+  box-shadow: 0 8px 24px #0002;
+}
+.score-panel:after {
+  border-color: #74d3c510;
+  box-shadow: 0 0 0 15px #74d3c505;
+}
+.tone-excellent {
+  --score-color: #00dfa0;
+  --score-soft: #104b40;
+  --score-ink: #65efb7;
+}
+.tone-good {
+  --score-color: #47d0f0;
+  --score-soft: #124757;
+  --score-ink: #8ce3f6;
+}
+.tone-fair {
+  --score-color: #ffc45a;
+  --score-soft: #4e3c1b;
+  --score-ink: #ffdc92;
+}
+.tone-poor {
+  --score-color: #ff947f;
+  --score-soft: #502e2a;
+  --score-ink: #ffbdb0;
+}
+.score-panel.tone-excellent {
+  --score-color: #00dfa0;
+}
+.score-label {
+  color: #65efb7;
+}
+.score-explain {
+  color: #acd0df;
+}
+.score-ring {
+  background: conic-gradient(
+    from 215deg,
+    var(--score-color) 0 var(--score),
+    #205561 var(--score) 360deg
+  );
+  box-shadow: 0 0 0 8px #07262e33;
+}
+.score-core {
+  background: #09313a;
+}
+.score-core strong {
+  color: #f5faf5;
+}
+.score-core span {
+  color: #b0e8dc;
+}
+.best-bite-banner {
+  background: linear-gradient(115deg, #382b14, #2b2418);
+  border-color: #b08234;
+  box-shadow: 0 6px 18px #0002;
+}
+.best-bite-icon {
+  background: #714705;
+  color: #ffd477;
+  border: 1px solid #b47e22;
+}
+.best-bite-banner small,
+.best-bite-banner > svg {
+  color: #ffd070;
+}
+.best-bite-banner strong {
+  color: #fcf5e7;
+}
+.best-bite-banner > span > span {
+  color: #dcc8a9;
+}
+.action-forecast,
+.primary-button {
+  background: linear-gradient(120deg, #006abf, #00799f);
+  border: 1px solid #37caed;
+  color: #f4fbff;
+  box-shadow: 0 5px 16px #0002;
+}
+.action-map,
+.secondary-button {
+  background: linear-gradient(120deg, #b9fa59, #9bec54);
+  color: #173b16;
+  border: 1px solid #caff8c;
+  box-shadow: 0 5px 16px #0002;
+}
+.aqua {
+  background: #104641;
+  color: #7bf2d7;
+}
+.blue {
+  background: #143f55;
+  color: #84dcff;
+}
+.orange {
+  background: #4b331d;
+  color: #ffc085;
+}
+.yellow {
+  background: #4a3d1d;
+  color: #ffdb80;
+}
+.purple {
+  background: #393557;
+  color: #ceb5ff;
+}
+.coral {
+  background: #4f3330;
+  color: #ffb198;
+}
+.text-button,
+.day-action,
+.hour-explain-button {
+  color: #70dff4;
+}
+.hour,
+.day-card,
+.forecast-hour {
+  border-color: #28515d;
+}
+.hour > small {
+  color: var(--muted);
+}
+.hour > svg {
+  color: #ffd166;
+}
+.peak-hour {
+  background: #123f35;
+  border-color: #387b57;
+}
+.peak-hour > span {
+  color: #9af2c3;
+}
+.peak-dot {
+  background: #7ae9ad;
+}
+.lure-0 {
+  background: linear-gradient(120deg, #103b35, #11382f);
+  border-color: #2d6152;
+}
+.lure-1 {
+  background: #103645;
+  border-color: #2c596a;
+}
+.lure-2 {
+  background: #3a3020;
+  border-color: #665136;
+}
+.lure-art {
+  background: linear-gradient(140deg, #244e33, #2c573b);
+  color: #b1eba0;
+}
+.lure-1 .lure-art {
+  background: linear-gradient(140deg, #184f65, #25576a);
+  color: #9de5ff;
+}
+.lure-2 .lure-art {
+  background: linear-gradient(140deg, #5a421d, #665025);
+  color: #ffda94;
+}
+.lure-rank {
+  color: #a1e5b5;
+}
+.lure-color,
+.lure-target,
+.lure-retrieve,
+.lure-why p {
+  color: #bbd4cc;
+}
+.lure-retrieve b,
+.lure-why summary {
+  color: #a2e4c4;
+}
+.lure-arrow {
+  color: #88c9b2;
+}
+.lure-retrieve,
+.lure-why {
+  border-color: #46746966;
+}
+.bite-window {
+  background: #113e49;
+  border-color: #356272;
+}
+.bite-window.primary {
+  background: var(--amber-soft);
+  border-color: #735c2d;
+}
+.bite-window > svg,
+.bite-window .kicker {
+  color: #f5ce79;
+}
+.bite-window small {
+  color: #d8c9ac;
+}
+.empty-window {
+  border-color: var(--line);
+}
+.empty-window strong {
+  color: var(--ink);
+}
+.empty-window p,
+.chart-readout > span,
+.chart-slider-label,
+.chart-legend,
+.pressure-grid small,
+.condition small,
+.weather-freshness {
+  color: var(--muted);
+}
+.trend-badge {
+  background: #15443c;
+  color: #91ebc7;
+}
+.chart-label {
+  fill: #aacbd3;
+}
+.pressure-chart svg rect {
+  fill: #0a2630;
+}
+.pressure-chart svg line:not(.pressure-line) {
+  stroke: #345b67;
+}
+.pressure-chart svg circle {
+  fill: #7addf4;
+}
+.pressure-chart svg circle[r="6"] {
+  fill: #ffcc69;
+}
+.pressure-line.falling {
+  stroke: #48dcb0;
+}
+.pressure-line.rising {
+  stroke: #ffcb6d;
+}
+.pressure-line.stable {
+  stroke: #60cafa;
+}
+.chart-slider::-webkit-slider-runnable-track {
+  background: #315863;
+}
+.chart-slider::-moz-range-track {
+  background: #315863;
+}
+.chart-legend .falling {
+  background: #48dcb0;
+}
+.chart-legend .rising {
+  background: #ffcb6d;
+}
+.chart-legend .stable {
+  background: #60cafa;
+}
+.pressure-grid strong {
+  color: #d0e9f5;
+}
+.sun-track {
+  background: #342b1a;
+  border-color: #615232;
+}
+.sun-track > div {
+  color: #ffd27a;
+}
+.sun-track small {
+  color: #ebc992;
+}
+.sun-track strong {
+  color: #ffdfac;
+}
+.positive {
+  color: #77e7b8;
+}
+.negative {
+  color: #ffb097;
+}
+.bottom-nav {
+  background: #062a35f5;
+  border-color: #286474;
+  box-shadow: 0 -8px 24px #0003;
+}
+.bottom-nav > button.active {
+  color: #68e4f9;
+}
+.bottom-nav > button.active .nav-icon {
+  background: #135365;
+  color: #68e4f9;
+}
+.bottom-nav > button.nav-spots.active {
+  color: #8cecba;
+}
+.bottom-nav > button.nav-spots.active .nav-icon {
+  background: #174c3f;
+  color: #8cecba;
+}
+.bottom-nav > button.nav-forecast.active {
+  color: #ffcf78;
+}
+.bottom-nav > button.nav-forecast.active .nav-icon {
+  background: #4b3b1c;
+  color: #ffcf78;
+}
+.day-card.selected {
+  background: #113f4c;
+  border-color: #57d5ed;
+}
+.day-weather b,
+.hour-metrics strong {
+  color: #d7e9ef;
+}
+.day-stats svg {
+  color: #8bd6e8;
+}
+.daily-window {
+  border-color: var(--line);
+}
+.daily-window > span {
+  color: #9fdac4;
+}
+.daily-window b {
+  color: #c1ecdb;
+}
+.forecast-hour-icon {
+  background: #41371e;
+  color: #ffd27a;
+}
+.forecast-hour-temp {
+  color: #c0dae1;
+}
+.forecast-hour > summary > svg {
+  color: #98bac4;
+}
+.forecast-hour[open] {
+  background: #123d48;
+  border-color: #4b8999;
+}
+.hour-metrics {
+  border-color: var(--line);
+}
+.hour-explain-button {
+  background: #154f5b;
+}
+.map-note,
+.map-permission {
+  background: var(--panel);
+  color: var(--muted);
+  border-color: var(--line);
+}
+.radius-control button,
+.filter-row button {
+  background: #0d3541;
+  border: 1px solid #39717e;
+  color: var(--ink);
+}
+.radius-control button.selected {
+  background: #125366;
+  border-color: #69d7e9;
+}
+.filter-row button.selected {
+  background: #205365;
+  color: #94e9f9;
+  border-color: #70cddf;
+}
+.map-recenter {
+  background: var(--panel);
+  color: #79ddf2;
+  border-color: var(--line);
+}
+.map-marker {
+  background: #35c7f2;
+  border-color: #daf8ff;
+  box-shadow:
+    0 0 0 7px #35c7f233,
+    0 3px 8px #0006;
+}
+.spots .maplibregl-ctrl-attrib,
+.spots .maplibregl-ctrl-attrib.maplibregl-compact {
+  background: #092b36ed;
+  color: #c9e3e8;
+}
+.spots .maplibregl-ctrl-attrib a {
+  color: #c9e3e8;
+}
+.spots .maplibregl-ctrl-attrib-button {
+  filter: invert(1);
+}
+.spot-icon {
+  background: #143f55;
+  color: #8bdff7;
+}
+.spot-icon.park {
+  background: #164838;
+  color: #91edbc;
+}
+.spot-icon.river {
+  background: #16434a;
+  color: #9ce5e8;
+}
+.spot-icon.boat-ramp,
+.spot-icon.pier,
+.spot-icon.fishing-spot {
+  background: #4a391d;
+  color: #ffd594;
+}
+.tags i {
+  background: #174f3b;
+  color: #b0ecc4;
+}
+.sheet {
+  background: #0b303a;
+  box-shadow: 0 -15px 45px #0006;
+  border: 1px solid var(--line);
+}
+.sheet-backdrop {
+  background: #000c;
+}
+.sheet::before {
+  background: #507982;
+}
+.spot-score {
+  background: linear-gradient(125deg, #0b4646, #0b394a);
+  border: 1px solid #347678;
+}
+.sheet .spot-score .score-core {
+  background: #09323a;
+}
+.search-row input::placeholder {
+  color: #9cbdc6;
+}
+.search-row > button:last-child {
+  background: #176277;
+  color: #f0fbff;
+}
+.empty-page {
+  background: linear-gradient(145deg, #103947, #0b2d36);
+}
+.empty-art {
+  background: #224e37;
+  color: #b4eda9;
+}
+.empty-page > p,
+.empty-features,
+.loading-card,
+.loading-card p,
+footer p,
+footer > span,
+.footer-brand {
+  color: var(--muted);
+}
+.loading-card h2 {
+  color: var(--ink);
+}
+.loading-ripple {
+  background: #154959;
+  color: #81e4f4;
+  box-shadow: 0 0 0 10px #123943;
+}
+footer a {
+  color: #8ae4f5;
+}
+.skip-link:focus {
+  background: var(--panel);
+  color: #94e4f4;
+}

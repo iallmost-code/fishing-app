@@ -1,6 +1,6 @@
 # WTF — Where’s the Fish
 
-The existing React + TypeScript + Vite fishing app, extended with mobile bottom navigation, an interactive real-data pressure graph, continuous bite windows, a full seven-day Forecast screen, and a MapLibre map. Bright blue styling, Monroe fallback, GPS, Open-Meteo, explainable scores and condition-based bass lure recommendations are preserved.
+The existing React + TypeScript + Vite fishing app, extended with mobile bottom navigation, an interactive real-data pressure graph, continuous bite windows, a full seven-day Forecast screen, and a MapLibre map. The dark lake design pairs deep teal panels with aqua, mint, amber and lime accents. Monroe fallback, GPS, Open-Meteo, explainable scores and condition-based bass lure recommendations are preserved.
 
 ## Run and verify
 
@@ -41,6 +41,8 @@ Phone screenshots at 412 × 915 using actual weather and nearby-water results at
 
 ## Mobile visual design
 
-The app now uses the WTF — Where’s the Fish brand, the supplied crossed-hooks logo, a locally bundled bass header and soft background on every tab, colorful thumb-friendly actions, soft seafoam and lake-blue panels that reduce bright white areas, and a phone-width layout capped at 480 CSS pixels. Forecast hours expand into touch-friendly cards. Presentation changes do not modify weather, pressure, fishing-score, window, or lure rules.
+The app now uses the WTF — Where’s the Fish brand, the supplied crossed-hooks logo, a locally bundled bass header and soft background on every tab, colorful thumb-friendly actions, deep lake-teal panels, mint fishing scores, amber bite windows, and a dark map, and a phone-width layout capped at 480 CSS pixels. Forecast hours expand into touch-friendly cards. Presentation changes do not modify weather, pressure, fishing-score, window, or lure rules.
 
-The original uploaded logo is preserved in `public/brand/wtf-original.jpg`. Bass artwork was generated for this app and packaged as a 151 KB WebP for mobile delivery. Public asset paths remain relative for GitHub Pages. The decorative fish image is not presented as a photograph of the selected fishing location.
+The original uploaded logo is preserved in `public/brand/wtf-original.jpg`. Bass artwork was generated for this app and packaged as a roughly 165 KB twilight WebP for mobile delivery. Public asset paths remain relative for GitHub Pages. The decorative fish image is not presented as a photograph of the selected fishing location.
+
+The dark palette is isolated in `src/styles/dark.css`, while component layout remains in the existing stylesheets. The PWA theme and launch colors match the app. The Twilight bass artwork is decorative, not a live view of the selected location.

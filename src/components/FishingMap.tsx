@@ -9,14 +9,14 @@ import { BASEMAP_STYLE } from "../services/maps/basemap";
 import { radiusPolygon } from "../services/maps/radius";
 
 const COLORS: Record<WaterLocation["type"], string> = {
-  park: "#16a34a",
-  lake: "#0284c7",
-  pond: "#0284c7",
-  reservoir: "#0284c7",
-  river: "#0e7490",
-  "boat-ramp": "#f59e0b",
-  pier: "#f59e0b",
-  "fishing-spot": "#f59e0b",
+  park: "#48d99a",
+  lake: "#4ad6ee",
+  pond: "#4ad6ee",
+  reservoir: "#4ad6ee",
+  river: "#81dde4",
+  "boat-ramp": "#ffcd71",
+  pier: "#ffcd71",
+  "fishing-spot": "#ffcd71",
 };
 
 function spotFeatures(spots: WaterLocation[]): FeatureCollection<Point> {
@@ -107,7 +107,7 @@ export default function FishingMap({
           type: "line",
           source: "search-radius",
           paint: {
-            "line-color": "#0369a1",
+            "line-color": "#74cfe8",
             "line-width": 1.5,
             "line-dasharray": [3, 2],
           },
