@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { lurePlan, periodFor, pickLure, type Conditions } from "./lurePlan";
+import {
+  lurePlan,
+  mergeSameBait,
+  periodFor,
+  pickLure,
+  type Conditions,
+  type LurePlanStop,
+} from "./lurePlan";
 import { scoreForecast } from "./forecast";
 import type { WeatherSnapshot, WeatherHour } from "../services/weather";
 
@@ -101,16 +108,15 @@ describe("lurePlan", () => {
 
   it("splits the rest of the day into stretches with a bait each", () => {
     const plan = lurePlan(weather, scoreForecast(weather));
+    // Midday and afternoon want the same bait, so they share one stop.
     expect(plan.map((p) => p.period)).toEqual([
-      "Midday",
-      "Afternoon",
+      "Midday – Afternoon",
       "Evening",
       "Night",
     ]);
-    // Midday is bright and calm; evening is low light.
     expect(plan[0].target).toMatch(/Shade/);
-    expect(plan[2].name).toBe("Topwater");
-    expect(plan[3].color).toMatch(/Black/);
+    expect(plan[1].name).toBe("Topwater");
+    expect(plan[2].color).toMatch(/Black/);
     // Stretches are back to back.
     for (let i = 1; i < plan.length; i++)
       expect(plan[i].start).toBe(plan[i - 1].end);
@@ -127,5 +133,44 @@ describe("lurePlan", () => {
     expect(periodFor("2026-10-04T02:00:00Z", tz, sunrise, sunset)).toBe(
       "Night",
     );
+  });
+});
+
+describe("mergeSameBait", () => {
+  const stop = (
+    period: string,
+    start: number,
+    end: number,
+    name = "Topwater",
+    prime = false,
+    score = 70,
+  ): LurePlanStop => ({
+    name,
+    color: "Bone",
+    retrieve: "Walk the dog",
+    target: "Shallow points",
+    reason: "x",
+    period,
+    start: new Date(start * 3600000).toISOString(),
+    end: new Date(end * 3600000).toISOString(),
+    prime,
+    score,
+  });
+  it("merges neighbours with the same bait and keeps different ones apart", () => {
+    const out = mergeSameBait([
+      stop("Early morning", 0, 2),
+      stop("Morning", 2, 5, "Topwater", true, 80),
+      stop("Midday", 5, 8, "Texas Rig"),
+      stop("Afternoon", 8, 10, "Topwater"),
+    ]);
+    expect(out.map((s) => s.name)).toEqual([
+      "Topwater",
+      "Texas Rig",
+      "Topwater",
+    ]);
+    expect(out[0].period).toBe("Early morning – Morning");
+    expect(out[0].prime).toBe(true);
+    expect(out[0].score).toBe(76); // (70×2 + 80×3) / 5
+    expect(out[0].end).toBe(new Date(5 * 3600000).toISOString());
   });
 });
