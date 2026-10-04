@@ -14,7 +14,8 @@ export type Period =
   | "Evening"
   | "Night";
 export type LurePlanStop = LureRecommendation & {
-  period: Period;
+  /** One stretch ("Evening") or several merged ones ("Early morning – Afternoon"). */
+  period: string;
   /** First hour of the stretch and one hour past its last. */
   start: string;
   end: string;
@@ -221,7 +222,7 @@ export function lurePlan(
     if (last && last.period === period) last.hours.push(h);
     else groups.push({ period, hours: [h] });
   }
-  return groups.map(({ period, hours: g }) => {
+  const stops = groups.map(({ period, hours: g }) => {
     const mid = g[Math.floor(g.length / 2)],
       start = g[0].time,
       end = new Date(Date.parse(g.at(-1)!.time) + HOUR).toISOString();
@@ -252,4 +253,35 @@ export function lurePlan(
         Date.parse(best.end) > Date.parse(start),
     };
   });
+  return mergeSameBait(stops);
+}
+
+/** Back-to-back stretches that want the same bait in the same spot become one stop. */
+export function mergeSameBait(stops: LurePlanStop[]): LurePlanStop[] {
+  const merged: LurePlanStop[] = [];
+  for (const stop of stops) {
+    const last = merged.at(-1);
+    if (
+      last &&
+      last.name === stop.name &&
+      last.color === stop.color &&
+      last.retrieve === stop.retrieve &&
+      last.target === stop.target
+    ) {
+      const first = last.period.split(" – ")[0];
+      merged[merged.length - 1] = {
+        ...last,
+        period: first === stop.period ? first : `${first} – ${stop.period}`,
+        end: stop.end,
+        prime: last.prime || stop.prime,
+        // Weighted by length so a long quiet stretch isn't dominated by a short one.
+        score: Math.round(
+          (last.score * (Date.parse(last.end) - Date.parse(last.start)) +
+            stop.score * (Date.parse(stop.end) - Date.parse(stop.start))) /
+            (Date.parse(stop.end) - Date.parse(last.start)),
+        ),
+      };
+    } else merged.push(stop);
+  }
+  return merged;
 }
