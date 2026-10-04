@@ -17,7 +17,7 @@ export function overpassQuery(lat: number, lon: number, radiusMiles: number) {
     around = `(around:${r},${lat.toFixed(4)},${lon.toFixed(4)})`;
   return `[out:json][timeout:25];
 (
-  nwr["natural"="water"]["name"]["water"!~"wastewater|swimming_pool|fountain|reflecting_pool|basin"]${around};
+  nwr["natural"="water"]["name"]["water"!~"wastewater|sewage|lagoon|swimming_pool|fountain|reflecting_pool|basin"]${around};
   way["waterway"="river"]["name"]${around};
   nwr["leisure"="fishing"]${around};
   nwr["leisure"="slipway"]${around};
@@ -37,6 +37,22 @@ type Element = {
 const isWater = (t: WaterType) =>
   t === "lake" || t === "pond" || t === "reservoir" || t === "river";
 
+/** Sewage and wastewater treatment water: never somewhere to fish. */
+const SEWAGE_NAME =
+  /sewage|sewer|waste ?water|wwtp|wpcp|effluent|sludge|lagoon|water reclamation|water pollution|treatment (plant|facility|pond|works)|settling (pond|basin)|oxidation pond|aeration/i;
+export function isSewage(tags: Record<string, string>) {
+  const words = [tags.name, tags.alt_name, tags.old_name, tags.operator]
+    .filter(Boolean)
+    .join(" ");
+  return (
+    SEWAGE_NAME.test(words) ||
+    ["wastewater", "sewage", "lagoon"].includes(tags.water) ||
+    ["wastewater", "sewage"].includes(tags.basin) ||
+    ["wastewater", "sewage"].includes(tags.content) ||
+    /wastewater|sewage/.test(tags.man_made ?? "") ||
+    tags.industrial === "sewage"
+  );
+}
 function classify(tags: Record<string, string>): WaterType | null {
   if (tags.leisure === "slipway") return "boat-ramp";
   if (tags.man_made === "pier") return "pier";
@@ -76,6 +92,7 @@ export function normalizeOverpass(
     if (!type || lat === undefined || lon === undefined) continue;
     if (tags.access === "private" || tags.access === "no") continue;
     if (tags.fishing === "no") continue;
+    if (isSewage(tags)) continue;
     const spot: WaterLocation = {
       id: `osm-${e.type}-${e.id}`,
       source: "osm",
@@ -120,7 +137,7 @@ export function normalizeOverpass(
 const cache = new Map<string, WaterLocation[]>();
 const CACHE_TTL = 24 * 3600 * 1000;
 function cacheKey(lat: number, lon: number, r: number) {
-  return `fishing:water:${lat.toFixed(2)},${lon.toFixed(2)}:${r}`;
+  return `fishing:water:v2:${lat.toFixed(2)},${lon.toFixed(2)}:${r}`;
 }
 
 export async function fetchOsmWater(
