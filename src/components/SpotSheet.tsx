@@ -130,7 +130,9 @@ export default function SpotSheet({
       <p className="credit">
         {spot.source === "alltrails"
           ? "Fishing info: AllTrails. Check park rules and Georgia fishing license requirements."
-          : "Map data © OpenStreetMap contributors. Being on the map doesn't mean public access."}
+          : spot.source === "guide"
+            ? "From the WTF spot list. Check posted rules and Georgia fishing license requirements."
+            : "Map data © OpenStreetMap contributors. Being on the map doesn't mean public access."}
       </p>
     </Sheet>
   );

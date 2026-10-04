@@ -1,5 +1,6 @@
 import type { WaterLocation } from "../../models/waterLocation";
 import { distanceMiles } from "./geo";
+import { EXTRA_FACTS, GUIDE_SPOTS } from "./guideSpots";
 
 /**
  * Parks within ~50 miles of Monroe, GA that AllTrails lists for fishing.
@@ -198,11 +199,11 @@ export function knownSpotsNear(
   center: { latitude: number; longitude: number },
   radiusMiles: number,
 ): WaterLocation[] {
-  return KNOWN_FISHING_PARKS.map((s) => ({
+  const parks: WaterLocation[] = KNOWN_FISHING_PARKS.map((s) => ({
     id: s.id,
-    source: "alltrails" as const,
+    source: "alltrails",
     name: s.name,
-    type: "park" as const,
+    type: "park",
     water: s.water,
     latitude: s.latitude,
     longitude: s.longitude,
@@ -211,6 +212,13 @@ export function knownSpotsNear(
       "Fishing allowed",
       ...(s.fee ? [s.fee] : []),
       ...(s.accessible ? ["Accessible paths"] : []),
+      ...(EXTRA_FACTS[s.id] ?? []),
     ],
-  })).filter((s) => s.distanceMiles <= radiusMiles);
+  }));
+  const guide: WaterLocation[] = GUIDE_SPOTS.map((s) => ({
+    ...s,
+    source: "guide",
+    distanceMiles: distanceMiles(center, s),
+  }));
+  return [...parks, ...guide].filter((s) => s.distanceMiles <= radiusMiles);
 }
