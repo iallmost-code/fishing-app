@@ -120,9 +120,13 @@ describe("mergeSpots", () => {
       "Meridian Lake",
     );
     expect(merged.some((s) => s.id === "osm-way-10")).toBe(true);
-    // Sorted nearest first.
-    expect(merged.map((s) => s.distanceMiles)).toEqual(
-      [...merged.map((s) => s.distanceMiles)].sort((a, b) => a - b),
+    // Confirmed spots first, each group nearest first.
+    const confirmed = merged.filter(
+      (s) => !s.facts.includes("Fishing unconfirmed"),
+    );
+    expect(merged.slice(0, confirmed.length)).toEqual(confirmed);
+    expect(confirmed.map((s) => s.distanceMiles)).toEqual(
+      [...confirmed.map((s) => s.distanceMiles)].sort((a, b) => a - b),
     );
   });
 
@@ -137,5 +141,51 @@ describe("mergeSpots", () => {
     expect(knownSpotsNear({ latitude: 30.3, longitude: -81.6 }, 50)).toEqual(
       [],
     );
+  });
+});
+
+describe("guide spots", () => {
+  it("adds local and state spots near Monroe with honest tags", () => {
+    const near = knownSpotsNear(monroe, 25);
+    const mathews = near.find((s) => s.name === "Mathews Park")!;
+    expect(mathews.source).toBe("guide");
+    expect(mathews.facts).toContain("Fishing unconfirmed");
+    const hardLabor = near.find(
+      (s) => s.name === "Hard Labor Creek State Park",
+    )!;
+    expect(hardLabor.facts).toContain("License 16+");
+    // Overlaps enrich the existing AllTrails entry instead of duplicating it.
+    expect(near.filter((s) => s.name === "Fort Yargo State Park")).toHaveLength(
+      1,
+    );
+    expect(
+      near.find((s) => s.name === "Fort Yargo State Park")!.facts,
+    ).toContain("Motors ≤10 HP");
+  });
+  it("covers state parks across Georgia", () => {
+    const hartwell = knownSpotsNear({ latitude: 34.37, longitude: -82.92 }, 25);
+    expect(hartwell.map((s) => s.name)).toContain("Hart State Park");
+  });
+  it("keeps a live lake separate from an unconfirmed park next to it", () => {
+    const park = knownSpotsNear(monroe, 25).find(
+      (s) => s.name === "Felker Park",
+    )!;
+    const merged = mergeSpots(
+      [park],
+      [
+        {
+          id: "osm-way-1",
+          source: "osm",
+          name: "Some Pond",
+          type: "pond",
+          latitude: park.latitude + 0.001,
+          longitude: park.longitude,
+          distanceMiles: park.distanceMiles,
+          facts: [],
+        },
+      ],
+      25,
+    );
+    expect(merged).toHaveLength(2);
   });
 });

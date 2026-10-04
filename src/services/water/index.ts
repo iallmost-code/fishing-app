@@ -41,7 +41,9 @@ export function mergeSpots(
     if (spot.distanceMiles > radiusMiles) continue;
     const park = merged.find(
       (p) =>
-        p.source === "alltrails" &&
+        p.source !== "osm" &&
+        // A park with no known water (fishing unconfirmed) keeps lakes separate.
+        (p.type !== "park" || !!p.water?.length) &&
         (spot.type === "lake" ||
           spot.type === "pond" ||
           spot.type === "reservoir") &&
@@ -54,5 +56,11 @@ export function mergeSpots(
     }
     merged.push(spot);
   }
-  return merged.sort((a, b) => a.distanceMiles - b.distanceMiles);
+  // Places where fishing is confirmed come first; unconfirmed ones follow.
+  const unconfirmed = (s: WaterLocation) =>
+    s.facts.includes("Fishing unconfirmed") ? 1 : 0;
+  return merged.sort(
+    (a, b) =>
+      unconfirmed(a) - unconfirmed(b) || a.distanceMiles - b.distanceMiles,
+  );
 }

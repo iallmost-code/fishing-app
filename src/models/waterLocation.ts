@@ -13,7 +13,8 @@ export type WaterType =
  */
 export type WaterLocation = {
   id: string;
-  source: "osm" | "alltrails";
+  /** osm: live map; alltrails: AllTrails fishing parks; guide: owner's spot list. */
+  source: "osm" | "alltrails" | "guide";
   name: string;
   type: WaterType;
   latitude: number;

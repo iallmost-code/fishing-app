@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { WaterLocation } from "../models/waterLocation";
-import { findNearbyWater } from "../services/water";
+import { findNearbyWater, mergeSpots } from "../services/water";
 import { knownSpotsNear } from "../services/water/knownSpots";
 import type { FishingLocation } from "../services/location";
 
@@ -16,8 +16,10 @@ export function useNearbyWater(location: FishingLocation, radiusMiles: number) {
     const controller = new AbortController();
     setLoading(true);
     // Known fishing parks need no network, so show them while live data loads.
-    const known = knownSpotsNear(location, radiusMiles).sort(
-      (a, b) => a.distanceMiles - b.distanceMiles,
+    const known = mergeSpots(
+      knownSpotsNear(location, radiusMiles),
+      [],
+      radiusMiles,
     );
     setSpots(known);
     findNearbyWater(
