@@ -7,6 +7,7 @@ import { dateKey } from "../utils/format";
 /** Water the plan is for; changes where to throw, not what. */
 export type PlanWater = "lake" | "pond" | "river";
 export type Period =
+  | "Before dawn"
   | "Early morning"
   | "Morning"
   | "Midday"
@@ -68,10 +69,12 @@ export function periodFor(
     set = sunset ? Date.parse(sunset) : NaN,
     h = localHour(time, timezone);
   if (Number.isFinite(rise) && Number.isFinite(set)) {
-    if (t < rise - HOUR || t >= set + HOUR) return "Night";
+    if (t < rise - HOUR) return "Before dawn";
+    if (t >= set + HOUR) return "Night";
     if (t < rise + 2 * HOUR) return "Early morning";
     if (t >= set - 2 * HOUR) return "Evening";
-  } else if (h < 5 || h >= 21) return "Night";
+  } else if (h < 5) return "Before dawn";
+  else if (h >= 21) return "Night";
   if (h < 11) return "Morning";
   if (h < 15) return "Midday";
   return "Afternoon";
@@ -136,7 +139,12 @@ export function pickLure(c: Conditions): LureRecommendation {
       reason:
         "Rain stains the water and washes in food; flash and thump help bass find the bait.",
     };
-  if ((c.light === "low" || cloudy) && wind < 10 && (c.temperature ?? 60) >= 55)
+  // Overcast helps at dawn and dusk but is not a reason to throw topwater all day.
+  if (
+    (c.light === "low" || (cloudy && c.light !== "bright")) &&
+    wind < 10 &&
+    (c.temperature ?? 60) >= 55
+  )
     return {
       name: "Topwater",
       color: cloudy ? "Bone" : shad,
@@ -173,7 +181,7 @@ export function pickLure(c: Conditions): LureRecommendation {
       target: where("Tight to cover in 6–12 ft", c.water),
       reason: `Rising pressure or cold water slows bass down, so slow your bait down too.${seasonTip(c.month)}`,
     };
-  if (c.light === "bright")
+  if (c.light === "bright" && !cloudy)
     return {
       name: "Texas Rig",
       color: "Green pumpkin",
@@ -189,7 +197,9 @@ export function pickLure(c: Conditions): LureRecommendation {
     color: shad,
     retrieve: "Slow to medium steady retrieve",
     target: where("Points, edges and anywhere you see bait", c.water),
-    reason: `A natural baitfish look that works in most conditions.${seasonTip(c.month)}`,
+    reason: cloudy
+      ? `Overcast keeps bass roaming, so cover water with a moving baitfish look.${seasonTip(c.month)}`
+      : `A natural baitfish look that works in most conditions.${seasonTip(c.month)}`,
   };
 }
 
@@ -228,7 +238,7 @@ export function lurePlan(
       end = new Date(Date.parse(g.at(-1)!.time) + HOUR).toISOString();
     const lure = pickLure({
       light:
-        period === "Night"
+        period === "Night" || period === "Before dawn"
           ? "dark"
           : period === "Early morning" || period === "Evening"
             ? "low"

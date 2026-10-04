@@ -42,6 +42,15 @@ describe("pickLure", () => {
   it("uses a spinnerbait at runoff when rain is likely", () => {
     expect(pickLure({ ...base, rainChance: 80 }).name).toBe("Spinnerbait");
   });
+  it("doesn't throw topwater all day just because it's overcast", () => {
+    const lure = pickLure({ ...base, light: "bright", cloudCover: 100 });
+    expect(lure.name).not.toBe("Topwater");
+    expect(lure.name).toBe("Swimbait");
+    // Dawn and dusk under cloud still get topwater.
+    expect(pickLure({ ...base, light: "low", cloudCover: 100 }).name).toBe(
+      "Topwater",
+    );
+  });
   it("goes dark at night", () => {
     expect(pickLure({ ...base, light: "dark" }).color).toMatch(/Black/);
   });
@@ -124,6 +133,9 @@ describe("lurePlan", () => {
 
   it("labels periods around sunrise and sunset", () => {
     const tz = "America/New_York";
+    expect(periodFor("2026-10-03T08:00:00Z", tz, sunrise, sunset)).toBe(
+      "Before dawn",
+    );
     expect(periodFor("2026-10-03T11:00:00Z", tz, sunrise, sunset)).toBe(
       "Early morning",
     );
