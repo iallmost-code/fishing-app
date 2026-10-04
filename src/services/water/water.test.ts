@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { normalizeOverpass, overpassQuery } from "./overpass";
+import { isSewage, normalizeOverpass, overpassQuery } from "./overpass";
 import { mergeSpots } from "./index";
 import { knownSpotsNear } from "./knownSpots";
 import { GUIDE_SPOTS } from "./guideSpots";
@@ -196,5 +196,52 @@ describe("guide spots", () => {
         s.facts.includes("Fishing unconfirmed") && !s.water?.length,
         s.name,
       ).toBe(false);
+  });
+});
+
+describe("sewage water", () => {
+  it("is never listed as a place to fish", () => {
+    const at = { lat: 33.8, lon: -83.7 };
+    const spots = normalizeOverpass(
+      [
+        {
+          type: "way",
+          id: 1,
+          center: at,
+          tags: { natural: "water", name: "Monroe Wastewater Treatment Pond" },
+        },
+        {
+          type: "way",
+          id: 2,
+          center: at,
+          tags: { natural: "water", name: "Sewage Lagoon 2" },
+        },
+        {
+          type: "way",
+          id: 3,
+          center: at,
+          tags: { natural: "water", name: "Pond B", water: "wastewater" },
+        },
+        {
+          type: "way",
+          id: 4,
+          center: at,
+          tags: {
+            natural: "water",
+            name: "Pond C",
+            operator: "City Water Pollution Control Plant",
+          },
+        },
+        {
+          type: "way",
+          id: 5,
+          center: at,
+          tags: { natural: "water", name: "Lake Varner" },
+        },
+      ],
+      monroe,
+    );
+    expect(spots.map((s) => s.name)).toEqual(["Lake Varner"]);
+    expect(isSewage({ name: "Rhodes Jordan Lake" })).toBe(false);
   });
 });
